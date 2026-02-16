@@ -27,7 +27,9 @@
 #include "message.h"
 #include "move_table.h"
 #include "party.h"
+#include "pokedex.h"
 #include "render_window.h"
+#include "savedata.h"
 #include "screen_fade.h"
 #include "sound_playback.h"
 #include "string_gf.h"
@@ -113,6 +115,7 @@ static void SubMenuRender_SelectVar(DebugSubMenu *subMenu);
 static void SubMenuChoice_VarValue(DebugSubMenu *subMenu);
 static void SubMenuRender_VarValue(DebugSubMenu *subMenu);
 
+static void DebugFunction_FillNationalDex(SysTask *task, DebugMenu *menu);
 static void DebugFunction_ExecuteFunction(SysTask *task, DebugMenu *menu);
 
 static const WindowTemplate DebugMenu_List_WindowTemplate = {
@@ -185,6 +188,10 @@ static const DebugMenuItem sMainMenuItems[DEBUG_MAIN_ITEM_COUNT] = {
     [DEBUG_ITEM_EXECUTE_FUNCTION] = {
         .function = DebugFunction_ExecuteFunction,
         .name = DebugMenu_ItemName_ExecuteFunction,
+    },
+    [DEBUG_ITEM_FILL_NATIONAL_DEX] = {
+        .function = DebugFunction_FillNationalDex,
+        .name = DebugMenu_ItemName_FillNationalDex,
     },
 };
 
@@ -1003,6 +1010,14 @@ static void SubMenuRender_VarValue(DebugSubMenu *subMenu)
     StringTemplate_SetNumber(subMenu->template, 1, subMenu->value, MAX_SUBMENU_DIGITS, PADDING_MODE_ZEROES, CHARSET_MODE_EN);
     StringTemplate_SetNumber(subMenu->template, 2, sPowersOfTen[subMenu->digits], MAX_SUBMENU_DIGITS, PADDING_MODE_NONE, CHARSET_MODE_EN);
     DebugSubMenu_PrintString(subMenu, DebugSubMenu_Template_VarValue, 0, 0, TEXT_SPEED_INSTANT, DEBUG_TEXT_BLACK);
+}
+
+// Fill National Dex
+static void DebugFunction_FillNationalDex(SysTask *task, DebugMenu *menu)
+{
+    Pokedex *pokedex = SaveData_GetPokedex(menu->fieldSystem->saveData);
+    Pokedex_FillNationalDex(pokedex);
+    DebugMenu_ExitToField(task, menu);
 }
 
 // Execute function

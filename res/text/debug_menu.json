@@ -50,6 +50,10 @@
       "en_US": "Debug Function"
     },
     {
+      "id": "DebugMenu_ItemName_FillNationalDex",
+      "en_US": "Fill National Dex"
+    },
+    {
       "id": "DebugSubMenu_Template_AddItem",
       "en_US": [
         "Item: {STRVAR_1 52, 0, 0}\n",
