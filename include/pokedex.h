@@ -38,6 +38,7 @@ u32 Pokedex_GetForm_Deoxys(const Pokedex *pokedex, int formIndex);
 u32 Pokedex_NumFormsSeen_Deoxys(const Pokedex *pokedex);
 void Pokedex_Encounter(Pokedex *pokedex, Pokemon *mon);
 void Pokedex_Capture(Pokedex *pokedex, Pokemon *mon);
+void Pokedex_FillNationalDex(Pokedex *pokedex);
 void Pokedex_ObtainNationalDex(Pokedex *pokedex);
 BOOL Pokedex_IsNationalDexObtained(const Pokedex *pokedex);
 BOOL Pokedex_CanDetectForms(const Pokedex *pokedex);

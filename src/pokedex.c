@@ -1084,6 +1084,19 @@ void Pokedex_Capture(Pokedex *pokedexData, Pokemon *mon)
     Write_SeenSpecies(pokedexData, species);
 }
 
+void Pokedex_FillNationalDex(Pokedex *pokedexData)
+{
+    CheckPokedexIntegrity(pokedexData);
+
+    u16 species;
+    for (species = 1; species <= NATIONAL_DEX_COUNT; species++) {
+        Write_CaughtSpecies(pokedexData, species);
+        Write_SeenSpecies(pokedexData, species);
+    }
+
+    Pokedex_ObtainNationalDex(pokedexData);
+}
+
 void Pokedex_ObtainNationalDex(Pokedex *pokedexData)
 {
     CheckPokedexIntegrity(pokedexData);

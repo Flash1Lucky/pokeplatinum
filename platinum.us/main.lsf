@@ -555,6 +555,8 @@ Overlay overlay5
 	Object main.nef.p/src_overlay005_scrcmd_move_tutor.c.o
 	Object main.nef.p/src_overlay005_ov5_021F8370.c.o
 	Object main.nef.p/src_overlay005_ov5_021F8560.c.o
+	Object main.nef.p/src_overlay005_debug_menu.c.o
+	Object main.nef.p/src_overlay005_debug_mon_menu.c.o
 }
 
 Overlay overlay6
@@ -1095,6 +1097,7 @@ Overlay game_start
 {
 	After main
 	Object main.nef.p/src_game_start.c.o
+	Object main.nef.p/src_debug_game_start.c.o
 }
 
 Overlay overlay58

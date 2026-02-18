@@ -5,6 +5,7 @@
 
 #include "applications/pokedex/ov21_021D4340.h"
 #include "applications/pokedex/ov21_021DC9BC.h"
+#include "applications/pokedex/pokedex_entry_display.h"
 #include "applications/pokedex/ov21_021E3FFC.h"
 #include "applications/pokedex/pokedex_app.h"
 #include "applications/pokedex/pokedex_data_manager.h"

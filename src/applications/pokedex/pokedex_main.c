@@ -17,6 +17,7 @@
 #include "applications/pokedex/ov21_021DC9BC.h"
 #include "applications/pokedex/ov21_021DDD2C.h"
 #include "applications/pokedex/ov21_021DE668.h"
+#include "applications/pokedex/pokedex_entry_display.h"
 #include "applications/pokedex/ov21_021E1924.h"
 #include "applications/pokedex/ov21_021E29DC.h"
 #include "applications/pokedex/ov21_021E3FFC.h"
