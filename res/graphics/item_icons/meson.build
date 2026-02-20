@@ -501,6 +501,7 @@ item_icon_pals = files(
     'petaya_berry.pal',
     'pinap_berry.pal',
     'pink_scarf.pal',
+    'pixie_plate.pal',
     'poffin_case.pal',
     'point_card.pal',
     'poison_barb.pal',

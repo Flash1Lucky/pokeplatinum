@@ -31,6 +31,7 @@
 #include "overlay005/struct_ov5_021DE5D0.h"
 
 #include "charcode_util.h"
+#include "debug.h"
 #include "flags.h"
 #include "heap.h"
 #include "inlines.h"
@@ -2865,8 +2866,22 @@ void BuildPokemonSpriteTemplate(PokemonSpriteTemplate *spriteTemplate, u16 speci
 
     case SPECIES_ARCEUS:
         spriteTemplate->narcID = NARC_INDEX_POKETOOL__POKEGRA__PL_OTHERPOKE;
-        spriteTemplate->character = 96 + (face / 2) + form * 2;
-        spriteTemplate->palette = 190 + shiny + form * 2;
+        if (form == TYPE_FAIRY) {
+            spriteTemplate->character = 154 + (face / 2);
+            spriteTemplate->palette = 250 + shiny;
+        } else {
+            spriteTemplate->character = 96 + (face / 2) + form * 2;
+            spriteTemplate->palette = 192 + shiny + form * 2;
+        }
+#ifdef LOGGING_ENABLED
+        EmulatorLog("ARCEUS_SPR_PL form=%d face=%d shiny=%d narc=%d chr=%d pal=%d",
+            form,
+            face,
+            shiny,
+            spriteTemplate->narcID,
+            spriteTemplate->character,
+            spriteTemplate->palette);
+#endif
         break;
 
     case SPECIES_CASTFORM:
@@ -3061,9 +3076,24 @@ static void BuildPokemonSpriteTemplateDP(PokemonSpriteTemplate *spriteTemplate, 
         break;
 
     case SPECIES_ARCEUS:
-        spriteTemplate->narcID = NARC_INDEX_POKETOOL__POKEGRA__OTHERPOKE;
-        spriteTemplate->character = 96 + (face / 2) + form * 2;
-        spriteTemplate->palette = 170 + shiny + form * 2;
+        if (form == TYPE_FAIRY) {
+            spriteTemplate->narcID = NARC_INDEX_POKETOOL__POKEGRA__PL_OTHERPOKE;
+            spriteTemplate->character = 154 + (face / 2);
+            spriteTemplate->palette = 250 + shiny;
+        } else {
+            spriteTemplate->narcID = NARC_INDEX_POKETOOL__POKEGRA__OTHERPOKE;
+            spriteTemplate->character = 96 + (face / 2) + form * 2;
+            spriteTemplate->palette = 172 + shiny + form * 2;
+        }
+#ifdef LOGGING_ENABLED
+        EmulatorLog("ARCEUS_SPR_DP form=%d face=%d shiny=%d narc=%d chr=%d pal=%d",
+            form,
+            face,
+            shiny,
+            spriteTemplate->narcID,
+            spriteTemplate->character,
+            spriteTemplate->palette);
+#endif
         break;
 
     case SPECIES_CASTFORM:
@@ -3215,7 +3245,11 @@ u8 LoadPokemonSpriteYOffset(u16 species, u8 gender, u8 face, u8 form, u32 person
 
     case SPECIES_ARCEUS:
         narcID = NARC_INDEX_POKETOOL__POKEGRA__HEIGHT_O;
-        memberIndex = 96 + (face / 2) + form * 2;
+        if (form == TYPE_FAIRY) {
+            memberIndex = 154 + (face / 2);
+        } else {
+            memberIndex = 96 + (face / 2) + form * 2;
+        }
         break;
 
     case SPECIES_CASTFORM:
@@ -3304,7 +3338,11 @@ static u8 LoadPokemonDPSpriteHeight(u16 species, u8 gender, u8 face, u8 form, u3
 
     case SPECIES_ARCEUS:
         narcID = NARC_INDEX_POKETOOL__POKEGRA__DP_HEIGHT_O;
-        memberIndex = 96 + (face / 2) + form * 2;
+        if (form == TYPE_FAIRY) {
+            memberIndex = 154 + (face / 2);
+        } else {
+            memberIndex = 96 + (face / 2) + form * 2;
+        }
         break;
 
     case SPECIES_CASTFORM:
@@ -4309,7 +4347,11 @@ void BoxPokemon_SetArceusForm(BoxPokemon *boxMon)
     int monHeldItem = BoxPokemon_GetValue(boxMon, MON_DATA_HELD_ITEM, NULL);
 
     if (monSpecies == SPECIES_ARCEUS && monAbility == ABILITY_MULTITYPE) {
-        int monForm = Pokemon_GetArceusTypeOf(Item_LoadParam(monHeldItem, ITEM_PARAM_HOLD_EFFECT, HEAP_ID_SYSTEM));
+        int holdEffect = Item_LoadParam(monHeldItem, ITEM_PARAM_HOLD_EFFECT, HEAP_ID_SYSTEM);
+        int monForm = Pokemon_GetArceusTypeOf(holdEffect);
+#ifdef LOGGING_ENABLED
+        EmulatorLog("ARCEUS_FORM item=%d hold=%d form=%d", monHeldItem, holdEffect, monForm);
+#endif
         BoxPokemon_SetValue(boxMon, MON_DATA_FORM, &monForm);
     }
 }
@@ -4367,10 +4409,17 @@ u8 Pokemon_GetArceusTypeOf(u16 itemHoldEffect)
     case HOLD_EFFECT_ARCEUS_STEEL:
         type = TYPE_STEEL;
         break;
+    case HOLD_EFFECT_ARCEUS_FAIRY:
+        type = TYPE_FAIRY;
+        break;
     default:
         type = TYPE_NORMAL;
         break;
     }
+
+#ifdef LOGGING_ENABLED
+    EmulatorLog("ARCEUS_TYPE hold=%d type=%d", itemHoldEffect, type);
+#endif
 
     return type;
 }

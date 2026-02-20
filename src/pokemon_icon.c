@@ -103,6 +103,7 @@ u16 BoxPokemon_IconFormOffset(const BoxPokemon *boxMon)
     case SPECIES_WORMADAM:
     case SPECIES_SHELLOS:
     case SPECIES_GASTRODON:
+    case SPECIES_ARCEUS:
     case SPECIES_GIRATINA:
     case SPECIES_SHAYMIN:
     case SPECIES_ROTOM:
