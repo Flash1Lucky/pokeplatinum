@@ -30,7 +30,7 @@ ALIGN_4 static const u32 sMoveTypeIconIndex[] = {
     0xE6,
     0xDD,
     0xE0,
-    0xEC, // 18 = TYPE_FAIRY (using Mystery icon)
+    0xEC, // 18 = TYPE_FAIRY (shares Mystery icon for battle/moves)
     0xF0, // 19 to 23 are contest types
     0xDB,
     0xDC,
@@ -57,7 +57,7 @@ ALIGN_4 static const u8 sMoveTypeIconPaletteIndex[] = {
     0x1,
     0x2,
     0x0,
-    0x2, // 18 = TYPE_FAIRY (using Mystery icon palette)
+    0x2, // 18 = TYPE_FAIRY (shares Mystery palette for battle/moves)
     0x0, // 19 to 23 are contest types
     0x1,
     0x1,

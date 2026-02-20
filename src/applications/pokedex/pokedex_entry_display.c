@@ -32,8 +32,8 @@
 #include "res/graphics/pokedex/zukan.naix.h"
 #include "res/text/bank/pokedex.h"
 
-// Type icon cell 17 displays the background box in the Pokedex sprite sheet
-#define POKEDEX_TYPE_ICON_BACKGROUND_BOX_CELL 0x11
+// Type icon cell 18 displays the background box in the Pokedex sprite sheet (shifted by Fairy type at cell 17)
+#define POKEDEX_TYPE_ICON_BACKGROUND_BOX_CELL 0x12
 
 typedef struct {
     int *displayWorkData;  // Work data pointer set from ov21_021D138C
