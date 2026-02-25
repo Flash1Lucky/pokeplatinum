@@ -27,6 +27,9 @@
 #include "message.h"
 #include "move_table.h"
 #include "party.h"
+#include "pc_boxes.h"
+#include "pokedex.h"
+#include "pokemon.h"
 #include "render_window.h"
 #include "screen_fade.h"
 #include "sound_playback.h"
@@ -104,6 +107,10 @@ static void ToggleDebugFlag(DebugMenu *menu, u16 flagID);
 static void DebugFunction_ToggleCollision(SysTask *task, DebugMenu *menu);
 static void DebugFunction_ToggleTrainerSee(SysTask *task, DebugMenu *menu);
 static void DebugFunction_ToggleEncounters(SysTask *task, DebugMenu *menu);
+static void DebugFunction_TogglePokedex(SysTask *task, DebugMenu *menu);
+static void DebugFunction_ToggleNationalDex(SysTask *task, DebugMenu *menu);
+static void DebugFunction_PokedexFlagsAll(SysTask *task, DebugMenu *menu);
+static void DebugFunction_PokedexFlagsReset(SysTask *task, DebugMenu *menu);
 static void DebugFunction_SetFlag(SysTask *task, DebugMenu *menu);
 static void SubMenuChoice_SetFlag(DebugSubMenu *subMenu);
 static void SubMenuRender_SetFlag(DebugSubMenu *subMenu);
@@ -200,6 +207,22 @@ static const DebugMenuItem sFlagVarItems[DEBUG_FLAG_VAR_ITEM_COUNT] = {
     [DEBUG_ITEM_TOGGLE_ENCOUNTERS] = {
         .function = DebugFunction_ToggleEncounters,
         .name = DebugMenu_ItemName_ToggleEncounters,
+    },
+    [DEBUG_ITEM_TOGGLE_POKEDEX] = {
+        .function = DebugFunction_TogglePokedex,
+        .name = DebugMenu_ItemName_TogglePokedex,
+    },
+    [DEBUG_ITEM_TOGGLE_NATIONAL_DEX] = {
+        .function = DebugFunction_ToggleNationalDex,
+        .name = DebugMenu_ItemName_ToggleNationalDex,
+    },
+    [DEBUG_ITEM_POKEDEX_FLAGS_ALL] = {
+        .function = DebugFunction_PokedexFlagsAll,
+        .name = DebugMenu_ItemName_PokedexFlagsAll,
+    },
+    [DEBUG_ITEM_POKEDEX_FLAGS_RESET] = {
+        .function = DebugFunction_PokedexFlagsReset,
+        .name = DebugMenu_ItemName_PokedexFlagsReset,
     },
     [DEBUG_ITEM_SET_FLAG] = {
         .function = DebugFunction_SetFlag,
@@ -796,6 +819,7 @@ static void FlagVarList_PrintCB(ListMenu *menu, u32 index, u8 onInit)
 {
     DebugListNode *node = (DebugListNode *)ListMenu_GetAttribute(menu, LIST_MENU_PARENT);
     VarsFlags *varsFlags = SaveData_GetVarsFlags(node->debugMenu->fieldSystem->saveData);
+    Pokedex *pokedex = SaveData_GetPokedex(node->debugMenu->fieldSystem->saveData);
     int textState = DEBUG_TEXT_STATE_DEFAULT;
 
     switch (index) {
@@ -807,6 +831,12 @@ static void FlagVarList_PrintCB(ListMenu *menu, u32 index, u8 onInit)
         break;
     case DEBUG_ITEM_TOGGLE_ENCOUNTERS:
         textState = VarsFlags_CheckFlag(varsFlags, FLAG_DEBUG_NO_ENCOUNTERS);
+        break;
+    case DEBUG_ITEM_TOGGLE_POKEDEX:
+        textState = Pokedex_IsObtained(pokedex) ? DEBUG_TEXT_STATE_ACTIVE : DEBUG_TEXT_STATE_INACTIVE;
+        break;
+    case DEBUG_ITEM_TOGGLE_NATIONAL_DEX:
+        textState = Pokedex_IsNationalDexObtained(pokedex) ? DEBUG_TEXT_STATE_ACTIVE : DEBUG_TEXT_STATE_INACTIVE;
         break;
     }
 
@@ -911,6 +941,36 @@ static void DebugFunction_ToggleEncounters(SysTask *task, DebugMenu *menu)
     ToggleDebugFlag(menu, FLAG_DEBUG_NO_ENCOUNTERS);
 }
 
+static void DebugFunction_TogglePokedex(SysTask *task, DebugMenu *menu)
+{
+    Pokedex *pokedex = SaveData_GetPokedex(menu->fieldSystem->saveData);
+
+    if (Pokedex_IsObtained(pokedex)) {
+        Pokedex_DisablePokedex(pokedex);
+        Sound_PlayEffect(SEQ_SE_DP_PC_LOGOFF);
+    } else {
+        Pokedex_ObtainPokedex(pokedex);
+        Sound_PlayEffect(SEQ_SE_DP_PC_LOGIN);
+    }
+
+    ListMenu_Draw(menu->listNode->listMenu);
+}
+
+static void DebugFunction_ToggleNationalDex(SysTask *task, DebugMenu *menu)
+{
+    Pokedex *pokedex = SaveData_GetPokedex(menu->fieldSystem->saveData);
+
+    if (Pokedex_IsNationalDexObtained(pokedex)) {
+        Pokedex_DisableNationalDex(pokedex);
+        Sound_PlayEffect(SEQ_SE_DP_PC_LOGOFF);
+    } else {
+        Pokedex_ObtainNationalDex(pokedex);
+        Sound_PlayEffect(SEQ_SE_DP_PC_LOGIN);
+    }
+
+    ListMenu_Draw(menu->listNode->listMenu);
+}
+
 // Set Flag
 
 static void DebugFunction_SetFlag(SysTask *task, DebugMenu *menu)
@@ -999,6 +1059,67 @@ static void SubMenuRender_VarValue(DebugSubMenu *subMenu)
     StringTemplate_SetNumber(subMenu->template, 1, subMenu->value, MAX_SUBMENU_DIGITS, PADDING_MODE_ZEROES, CHARSET_MODE_EN);
     StringTemplate_SetNumber(subMenu->template, 2, sPowersOfTen[subMenu->digits], MAX_SUBMENU_DIGITS, PADDING_MODE_NONE, CHARSET_MODE_EN);
     DebugSubMenu_PrintString(subMenu, DebugSubMenu_Template_VarValue, 0, 0, TEXT_SPEED_INSTANT, DEBUG_TEXT_BLACK);
+}
+
+// Dex flags section
+
+static void DebugFunction_PokedexFlagsAll(SysTask *task, DebugMenu *menu)
+{
+    Pokedex *pokedex = SaveData_GetPokedex(menu->fieldSystem->saveData);
+
+    // Mark all species as seen and caught (doesn't change regional vs national dex mode)
+    Pokedex_SetAllSeenCaught(pokedex);
+
+    Sound_PlayEffect(SEQ_SE_DP_PC_LOGIN);
+    ListMenu_Draw(menu->listNode->listMenu);
+}
+
+static void DebugFunction_PokedexFlagsReset(SysTask *task, DebugMenu *menu)
+{
+    Pokedex *pokedex = SaveData_GetPokedex(menu->fieldSystem->saveData);
+    Party *party = SaveData_GetParty(menu->fieldSystem->saveData);
+    PCBoxes *pcBoxes = SaveData_GetPCBoxes(menu->fieldSystem->saveData);
+    int i, boxId, slot;
+    u16 species;
+    Pokemon *mon, *tempMon;
+    BOOL hadNationalDex = Pokedex_IsNationalDexObtained(pokedex);
+
+    // Reset pokedex to empty
+    Pokedex_Init(pokedex);
+    // Restore pokedex and national dex if it was obtained
+    Pokedex_ObtainPokedex(pokedex);
+    if (hadNationalDex) {
+        Pokedex_ObtainNationalDex(pokedex);
+    }
+
+    // Re-add all party pokemon to pokedex
+    int partyCount = Party_GetCurrentCount(party);
+    for (i = 0; i < partyCount; i++) {
+        mon = Party_GetPokemonBySlotIndex(party, i);
+        species = Pokemon_GetValue(mon, MON_DATA_SPECIES, NULL);
+        if (species != SPECIES_NONE) {
+            Pokedex_Encounter(pokedex, mon);
+            Pokedex_Capture(pokedex, mon);
+        }
+    }
+
+    // Re-add all box pokemon to pokedex
+    for (boxId = 0; boxId < MAX_PC_BOXES; boxId++) {
+        for (slot = 0; slot < MAX_MONS_PER_BOX; slot++) {
+            BoxPokemon *boxMon = PCBoxes_GetBoxMonAt(pcBoxes, boxId, slot);
+            species = BoxPokemon_GetValue(boxMon, MON_DATA_SPECIES, NULL);
+            if (species != SPECIES_NONE) {
+                tempMon = Pokemon_New(HEAP_ID_FIELD1);
+                Pokemon_FromBoxPokemon(boxMon, tempMon);
+                Pokedex_Encounter(pokedex, tempMon);
+                Pokedex_Capture(pokedex, tempMon);
+                Heap_Free(tempMon);
+            }
+        }
+    }
+
+    Sound_PlayEffect(SEQ_SE_DP_PC_LOGOFF);
+    ListMenu_Draw(menu->listNode->listMenu);
 }
 
 // Execute function

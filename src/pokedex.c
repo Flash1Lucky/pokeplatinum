@@ -1144,6 +1144,29 @@ void Pokedex_ObtainPokedex(Pokedex *pokedex)
     pokedex->pokedexObtained = TRUE;
 }
 
+void Pokedex_DisablePokedex(Pokedex *pokedex)
+{
+    CheckPokedexIntegrity(pokedex);
+    pokedex->pokedexObtained = FALSE;
+}
+
+void Pokedex_DisableNationalDex(Pokedex *pokedex)
+{
+    CheckPokedexIntegrity(pokedex);
+    pokedex->nationalDexObtained = FALSE;
+}
+
+void Pokedex_SetAllSeenCaught(Pokedex *pokedex)
+{
+    CheckPokedexIntegrity(pokedex);
+    
+    // Set all species as seen and caught (species 1 to NATIONAL_DEX_COUNT)
+    for (u16 species = 1; species <= NATIONAL_DEX_COUNT; species++) {
+        Write_SeenSpecies(pokedex, species);
+        Write_CaughtSpecies(pokedex, species);
+    }
+}
+
 Pokedex *SaveData_GetPokedex(SaveData *saveData)
 {
     return SaveData_SaveTable(saveData, SAVE_TABLE_ENTRY_POKEDEX);

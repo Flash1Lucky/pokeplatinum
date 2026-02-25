@@ -50,6 +50,22 @@
       "en_US": "Debug Function"
     },
     {
+      "id": "DebugMenu_ItemName_TogglePokedex",
+      "en_US": "Pokedex"
+    },
+    {
+      "id": "DebugMenu_ItemName_ToggleNationalDex",
+      "en_US": "National Dex"
+    },
+    {
+      "id": "DebugMenu_ItemName_PokedexFlagsAll",
+      "en_US": "Dex Flags All"
+    },
+    {
+      "id": "DebugMenu_ItemName_PokedexFlagsReset",
+      "en_US": "Dex Flags Reset"
+    },
+    {
       "id": "DebugSubMenu_Template_AddItem",
       "en_US": [
         "Item: {STRVAR_1 52, 0, 0}\n",
