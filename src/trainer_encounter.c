@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "constants/approach_type.h"
+#include "constants/debug_menu.h"
 #include "constants/field/dynamic_map_features.h"
 #include "constants/map_object.h"
 #include "generated/movement_actions.h"
@@ -29,6 +30,7 @@
 #include "sys_task_manager.h"
 #include "trainer_types.h"
 #include "unk_020655F4.h"
+#include "vars_flags.h"
 
 typedef struct ApproachingTrainerTemplate {
     int distance;
@@ -83,6 +85,10 @@ int (*const sApproachingTrainerTask[])(ApproachingTrainerData *);
 
 BOOL FieldSystem_CheckForTrainersWantingBattle(FieldSystem *fieldSystem, BOOL hasTwoAliveMons)
 {
+    if (DEBUG_MENU_ENABLED && VarsFlags_CheckFlag(SaveData_GetVarsFlags(fieldSystem->saveData), FLAG_DEBUG_NO_TRAINER_SEE)) {
+        return FALSE;
+    }
+
     ApproachingTrainerTemplate trainer;
     MapObjectManager *mapObjMan = fieldSystem->mapObjMan;
     PlayerAvatar *playerAvatar = fieldSystem->playerAvatar;

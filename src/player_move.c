@@ -3,6 +3,7 @@
 #include <nitro.h>
 #include <string.h>
 
+#include "constants/debug_menu.h"
 #include "constants/field/dynamic_map_features.h"
 #include "constants/field/map.h"
 #include "constants/map_object.h"
@@ -29,6 +30,7 @@
 #include "sound_playback.h"
 #include "terrain_collision_manager.h"
 #include "unk_020655F4.h"
+#include "vars_flags.h"
 
 typedef BOOL (*TileBehaviorFunc)(u8);
 
@@ -1015,6 +1017,16 @@ static void PlayerAvatar_SetMovement_Moving(PlayerAvatar *playerAvatar, MapObjec
  */
 static void PlayerAvatar_SetMovement_NormalOverworld(PlayerAvatar *playerAvatar, MapObject *mapObj, int dir, u16 keyPad, u16 keyPress)
 {
+    // Limit collision bypass to ordinary walking; keep surfing/bike/distortion rules intact.
+    FieldSystem *fieldSystem = MapObject_FieldSystem(mapObj);
+    if (DEBUG_MENU_ENABLED && PlayerAvatar_GetPlayerState(playerAvatar) == PLAYER_AVATAR_WALKING
+        && VarsFlags_CheckFlag(SaveData_GetVarsFlags(fieldSystem->saveData), FLAG_DEBUG_NO_COLLISION)
+        && (keyPress & (PAD_KEY_UP | PAD_KEY_DOWN | PAD_KEY_LEFT | PAD_KEY_RIGHT)) && dir >= DIR_NORTH && dir <= DIR_EAST) {
+        int action = MovementAction_TurnActionTowardsDir(dir, MOVEMENT_ACTION_WALK_NORMAL_NORTH);
+        PlayerAvatar_SetMovement(playerAvatar, mapObj, action, PLAYER_ACTION_SPEED_NORMAL);
+        return;
+    }
+
     int movementAction;
     int speed;
 

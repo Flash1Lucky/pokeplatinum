@@ -9,6 +9,11 @@ project('pokeplatinum', ['c', 'cpp', 'nasm'],
 
 fs = import('fs')
 
+configure_file(
+    output: 'debug_menu_config.h',
+    configuration: {'DEBUG_MENU_BUILD_ENABLED': get_option('debug_menu') ? 1 : 0},
+)
+
 ############################################################
 ###                    INCLUDE PATHS                     ###
 ############################################################

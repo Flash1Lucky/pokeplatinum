@@ -1,4 +1,5 @@
 #include "macros/scrcmd.inc"
+#include "constants/debug_menu.h"
 
 
     ScriptEntry InitNewGame
@@ -123,4 +124,27 @@ InitNewGame:
     SetFlag FLAG_HIDE_FIGHT_AREA_PALMER
     SetFlag FLAG_HIDE_VILLA_DELIVERY_GUY
     SetFlag FLAG_HIDE_VILLA_BOOK
+#if DEBUG_MENU_ENABLED
+    GoToIfSet FLAG_DEBUG_GAME_START, DebugNewGame
+#endif
     End
+
+#if DEBUG_MENU_ENABLED
+@ Minimal Sinnoh development preset; not a full campaign-unlock state.
+DebugNewGame:
+    SetFlag FLAG_HAS_POKEDEX
+    SetFlag FLAG_HIDE_TWINLEAF_TOWN_RIVAL_HOUSE_2F_RIVAL
+    SetFlag FLAG_HIDE_ROUTE_201_RIVAL
+    SetFlag FLAG_HIDE_SANDGEM_TOWN_COUNTERPART
+    SetFlag FLAG_HIDE_SANDGEM_TOWN_LAB_COUNTERPART
+    SetVar VAR_TWINLEAF_TOWN_GUITARIST_TRIGGER_STATE,  2
+    SetVar VAR_TWINLEAF_TOWN_RIVAL_TRIGGER_STATE, 1
+    SetVar VAR_FOLLOWER_RIVAL_STATE, 4
+    SetVar VAR_PLAYER_HOUSE_STATE, 2
+    SetVar VAR_RIVAL_HOUSE_STATE, 1
+    SetVar VAR_VERITY_LAKEFRONT_STATE, 1
+    SetVar VAR_SANDGEM_TOWN_STATE, 2
+    SetVar VAR_SANDGEM_TOWN_LAB_STATE, 1
+    SetVar VAR_LAKE_VERITY_PROF_ROWAN_STATE, 1
+    End
+#endif

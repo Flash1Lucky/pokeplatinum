@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "constants/field/dynamic_map_features.h"
+#include "constants/field/map_load.h"
 #include "constants/field_poison.h"
 #include "constants/player_avatar.h"
 #include "generated/game_records.h"
@@ -15,6 +16,7 @@
 #include "field/field_system.h"
 #include "field/field_system_sub2_t.h"
 #include "overlay005/daycare.h"
+#include "overlay005/debug_menu.h"
 #include "overlay005/honey_tree.h"
 #include "overlay005/ov5_021DFB54.h"
 #include "overlay005/ov5_021E1154.h"
@@ -111,6 +113,8 @@ static void FieldInput_Clear(FieldInput *input)
     input->dummy5 = FALSE;
     input->playerDir = DIR_NONE;
     input->transitionDir = DIR_NONE;
+    input->debugMenu = FALSE;
+    input->debugKey = FALSE;
 }
 
 void FieldInput_Update(FieldInput *input, FieldSystem *fieldSystem, u16 pressedKeys, u16 heldKeys)
@@ -169,6 +173,21 @@ void FieldInput_Update(FieldInput *input, FieldSystem *fieldSystem, u16 pressedK
     }
 
     input->playerDir = PlayerAvatar_CalcFaceDirection(fieldSystem->playerAvatar, pressedKeys, heldKeys);
+
+    // start debug menu
+    if (DEBUG_MENU_ENABLED && fieldSystem->mapLoadType == MAP_LOAD_TYPE_OVERWORLD && (heldKeys & DEBUG_KEY)) {
+        input->debugKey = TRUE;
+
+        input->movement = FALSE;
+        input->endMovement = FALSE;
+        input->sign = FALSE;
+        input->mapTransition = FALSE;
+
+        if (input->menu) {
+            input->menu = FALSE;
+            input->debugMenu = TRUE;
+        }
+    }
 }
 
 BOOL FieldInput_Process(const FieldInput *input, FieldSystem *fieldSystem)
@@ -331,6 +350,12 @@ BOOL FieldInput_Process(const FieldInput *input, FieldSystem *fieldSystem)
     if (input->menu && FieldSystem_IsInValidLocation(fieldSystem) == TRUE) {
         Sound_PlayEffect(SEQ_SE_DP_WIN_OPEN_sseq);
         StartMenu_Open(fieldSystem);
+        return TRUE;
+    }
+
+    if (input->debugMenu) {
+        Sound_PlayEffect(SEQ_SE_DP_WIN_OPEN_sseq);
+        DebugMenu_Init(fieldSystem);
         return TRUE;
     }
 
