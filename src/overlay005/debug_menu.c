@@ -21,6 +21,7 @@
 #include "bag.h"
 #include "camera.h"
 #include "debug.h"
+#include "debug_battle.h"
 #include "field_map_change.h"
 #include "field_system.h"
 #include "item.h"
@@ -121,6 +122,9 @@ static void SubMenuChoice_VarValue(DebugSubMenu *subMenu);
 static void SubMenuRender_VarValue(DebugSubMenu *subMenu);
 
 static void DebugFunction_ExecuteFunction(SysTask *task, DebugMenu *menu);
+static void DebugFunction_BattleFixture(SysTask *task, DebugMenu *menu);
+static void DebugFunction_BattleResult(SysTask *task, DebugMenu *menu);
+static void SubMenuRender_BattleResult(DebugSubMenu *subMenu);
 
 static const WindowTemplate DebugMenu_List_WindowTemplate = {
     .bgLayer = BG_LAYER_MAIN_3,
@@ -192,6 +196,14 @@ static const DebugMenuItem sMainMenuItems[DEBUG_MAIN_ITEM_COUNT] = {
     [DEBUG_ITEM_EXECUTE_FUNCTION] = {
         .function = DebugFunction_ExecuteFunction,
         .name = DebugMenu_ItemName_ExecuteFunction,
+    },
+    [DEBUG_ITEM_BATTLE_FIXTURE] = {
+        .function = DebugFunction_BattleFixture,
+        .name = DebugMenu_ItemName_BattleFixture,
+    },
+    [DEBUG_ITEM_BATTLE_RESULT] = {
+        .function = DebugFunction_BattleResult,
+        .name = DebugMenu_ItemName_BattleResult,
     },
 };
 
@@ -274,6 +286,11 @@ static const DebugSubMenuConfig sSubMenuConfigs[DEBUG_SUBMENU_TYPE_COUNT] = {
         .preserveSprite = FALSE,
         .min = 0,
         .max = 0xFFFF,
+    },
+    [DEBUG_SUBMENU_BATTLE_RESULT] = {
+        .renderFunc = SubMenuRender_BattleResult,
+        .min = 0,
+        .max = DEBUG_BATTLE_CASE_COUNT,
     },
 };
 
@@ -508,7 +525,11 @@ static DebugSubMenu *DebugMenu_CreateSubMenu(DebugMenu *menu, enum DebugSubMenuT
     SysTask *task = SysTask_Start(Task_DebugSubMenu_HandleInput, subMenu, 0);
 
     subMenu->window = Window_New(HEAP_ID_FIELD1, 1);
-    Window_AddFromTemplate(fieldSystem->bgConfig, subMenu->window, &DebugMenu_SubMenu_WindowTemplate);
+    WindowTemplate windowTemplate = DebugMenu_SubMenu_WindowTemplate;
+    if (type == DEBUG_SUBMENU_BATTLE_RESULT) {
+        windowTemplate.height = 17;
+    }
+    Window_AddFromTemplate(fieldSystem->bgConfig, subMenu->window, &windowTemplate);
     Window_DrawStandardFrame(subMenu->window, TRUE, 660, 11);
 
     Window_FillTilemap(subMenu->window, DEBUG_COLOR_WHITE);
@@ -532,12 +553,12 @@ static void Task_DebugSubMenu_HandleInput(SysTask *task, void *data)
     const DebugSubMenuConfig *config = &sSubMenuConfigs[subMenu->type];
 
     if (JOY_NEW(PAD_KEY_UP)) {
-        subMenu->value += sPowersOfTen[subMenu->digits];
+        subMenu->value += subMenu->type == DEBUG_SUBMENU_BATTLE_RESULT ? 1 : sPowersOfTen[subMenu->digits];
         if (subMenu->value > config->max) {
             subMenu->value = config->max;
         }
     } else if (JOY_NEW(PAD_KEY_DOWN)) {
-        subMenu->value -= sPowersOfTen[subMenu->digits];
+        subMenu->value -= subMenu->type == DEBUG_SUBMENU_BATTLE_RESULT ? 1 : sPowersOfTen[subMenu->digits];
         if (subMenu->value < config->min) {
             subMenu->value = config->min;
         }
@@ -1151,4 +1172,59 @@ static void DebugFunction_ExecuteFunction(SysTask *task, DebugMenu *menu)
     VarsFlags_ClearFlag(flags, FLAG_DEBUG_NO_TRAINER_SEE);
     VarsFlags_ClearFlag(flags, FLAG_DEBUG_NO_ENCOUNTERS);
     DebugMenu_ExitToField(task, menu);
+}
+
+static void DebugFunction_BattleFixture(SysTask *task, DebugMenu *menu)
+{
+    if (DebugBattle_Start(menu->fieldSystem)) {
+        DebugMenu_Close(task, menu);
+    } else {
+        DebugFunction_BattleResult(task, menu);
+    }
+}
+
+static void DebugFunction_BattleResult(SysTask *task, DebugMenu *menu)
+{
+    if (DebugMenu_CreateSubMenu(menu, DEBUG_SUBMENU_BATTLE_RESULT, 0) != NULL) {
+        SysTask_Done(task);
+    }
+}
+
+static void SubMenuRender_BattleResult(DebugSubMenu *subMenu)
+{
+    Window_FillTilemap(subMenu->window, DEBUG_COLOR_WHITE);
+    if (subMenu->value == 0) {
+        DebugBattleSummary summary = DebugBattle_GetSummary();
+        u32 status = DebugMenu_Text_NoBattleResult;
+        if (summary.failed) status = DebugMenu_Text_BattleFail;
+        else if (summary.completed == DEBUG_BATTLE_CASE_COUNT && summary.repeats == DEBUG_BATTLE_CASE_COUNT) status = DebugMenu_Text_BattlePass;
+        DebugSubMenu_PrintString(subMenu, status, 0, 0, TEXT_SPEED_INSTANT, DEBUG_TEXT_BLACK);
+        StringTemplate_SetNumber(subMenu->template, 0, summary.completed, 2, PADDING_MODE_NONE, CHARSET_MODE_EN);
+        StringTemplate_SetNumber(subMenu->template, 1, DEBUG_BATTLE_CASE_COUNT, 2, PADDING_MODE_NONE, CHARSET_MODE_EN);
+        StringTemplate_SetNumber(subMenu->template, 2, summary.passed, 2, PADDING_MODE_NONE, CHARSET_MODE_EN);
+        StringTemplate_SetNumber(subMenu->template, 3, summary.probes, 2, PADDING_MODE_NONE, CHARSET_MODE_EN);
+        StringTemplate_SetNumber(subMenu->template, 4, summary.failed, 2, PADDING_MODE_NONE, CHARSET_MODE_EN);
+        StringTemplate_SetNumber(subMenu->template, 5, summary.repeats, 2, PADDING_MODE_NONE, CHARSET_MODE_EN);
+        DebugSubMenu_PrintString(subMenu, DebugMenu_Text_BattleSummary, 0, 16, TEXT_SPEED_INSTANT, DEBUG_TEXT_BLACK);
+        return;
+    }
+    int index = subMenu->value - 1;
+    const DebugBattleResult *result = DebugBattle_GetResult(index);
+    if (!result->valid) {
+        DebugSubMenu_PrintString(subMenu, DebugMenu_Text_NoBattleResult, 0, 0, TEXT_SPEED_INSTANT, DEBUG_TEXT_BLACK);
+        return;
+    }
+    u32 status = result->failures == 0 ? DebugMenu_Text_BattlePass : DebugMenu_Text_BattleFail;
+    if (result->expectedFailures) {
+        status = result->failures == result->expectedFailures ? DebugMenu_Text_BattleXFail : DebugMenu_Text_BattleFail;
+    }
+    DebugSubMenu_PrintString(subMenu, status, 0, 0, TEXT_SPEED_INSTANT, DEBUG_TEXT_BLACK);
+    DebugSubMenu_PrintString(subMenu, DebugBattle_GetCaseName(index), 0, 16, TEXT_SPEED_INSTANT, DEBUG_TEXT_BLACK);
+    StringTemplate_SetNumber(subMenu->template, 0, result->failures, 3, PADDING_MODE_NONE, CHARSET_MODE_EN);
+    StringTemplate_SetNumber(subMenu->template, 1, result->damage, 3, PADDING_MODE_NONE, CHARSET_MODE_EN);
+    StringTemplate_SetNumber(subMenu->template, 2, DebugBattle_GetExpectedDamage(index), 3, PADDING_MODE_NONE, CHARSET_MODE_EN);
+    StringTemplate_SetNumber(subMenu->template, 3, result->repeatMatched, 1, PADDING_MODE_NONE, CHARSET_MODE_EN);
+    StringTemplate_SetNumber(subMenu->template, 4, result->playerPP, 2, PADDING_MODE_NONE, CHARSET_MODE_EN);
+    StringTemplate_SetNumber(subMenu->template, 5, result->result, 2, PADDING_MODE_NONE, CHARSET_MODE_EN);
+    DebugSubMenu_PrintString(subMenu, DebugMenu_Text_BattleResult, 0, 32, TEXT_SPEED_INSTANT, DEBUG_TEXT_BLACK);
 }

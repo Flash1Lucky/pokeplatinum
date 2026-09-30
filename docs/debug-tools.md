@@ -33,7 +33,7 @@ No save structure is widened. Reserved existing flag slots are `0x0974` (collisi
 
 Collision bypass applies on foot in the normal-overworld movement handler while moving in a direction. Trainer sight and step encounters have separate switches. Fishing, scripted/static battles, honey trees, and other encounter paths are not covered by the step-encounter switch.
 
-The recovered startup preset is Sinnoh-specific and separate from the generic editor. It sets trainer identity, supplies two level-100 utility Pokemon and travel items, and grants all badges as in the original feature. It is intended for a disposable development save. It is not evidence of a completed campaign. Startup seeds both RNGs to `0x504C4154`, but **does not make later battles deterministic**. A seeded battle fixture applied immediately before battle is still pending.
+The recovered startup preset is Sinnoh-specific and separate from the generic editor. It sets trainer identity, supplies two level-100 utility Pokemon and travel items, and grants all badges as in the original feature. It is intended for a disposable development save. It is not evidence of a completed campaign. Startup seeds both RNGs to `0x504C4154`, but **does not make later battles deterministic**. The separate Battle Tests suite resets the battle-local RNG seed immediately before each battle; see `battle-tests.md`.
 
 ## Validation record
 
@@ -45,15 +45,24 @@ Completed so far:
 - Debug-enabled ROM build completed (2026-09-29); test copy: `build/debug-tools-test.nds`. SHA-1: `5ce45af78989df1410f0a7d767def040894b82fb`.
 - Eric reports all five smoke checks passed in standalone melonDS: repeated menu entry/exit with movement restored; item additions; Pokemon edits and cancellation; normal save/close/reload persistence; Fly and encounter/reset controls. These are user-confirmed functional checks, not exhaustive boundary coverage.
 - Debug-disabled new-game script preprocessing matches the baseline tokens.
+- Debug-disabled checkpoint ROM built successfully: `build/debug-tools-disabled.nds`, SHA-1 `099dbc4ba309440f0f120bded9e749f7711e39cd`, source checkpoint `c08399db9`.
+- Eric confirms R+X does not open debug tools in the disabled checkpoint ROM. This confirms the entry gate; saved-cheat behavior is not yet separately verified.
+- Battle fixture v1 ROM built successfully: `build/debug-tools-battle-v1.nds`, SHA-1 `78f7bdc3da3372afa2ed41073819a3c46674d9a9`. Eric tested it: Test Battle did nothing. The launch guard incorrectly rejected the ordinary overworld parent process. Superseded by the automated harness below.
 - Text banks parse and contain unique message IDs.
 - Reviewed cancellation, empty-party guards, item capacity reporting, and removed menu/editor/camera use-after-free paths and the egg met-location array-index error.
 
 Pending:
 
-- Disabled ROM build and runtime comparison.
+- Remaining disabled-ROM checks: normal menu/movement and persistence, and inactive cheat hooks with saved toggles enabled.
 - Additional runtime edge cases: full bag and party/PC capacity, numeric flag/var boundaries, and unsupported contexts.
 - Capacity/egg/form/PP/metadata round trips in summary, battle and PC storage.
-- Deterministic battle fixture and repeated/restart outcome checks.
+- Automated battle suite: Eric confirmed PASS/PASS/FAIL (probe) on v2, then reported the repeat/cold-start and original party/bag/location checks worked properly. V3 type/STAB acceptance remains pending. See `battle-tests.md`.
 - Minimal and initial combined acceptance gates, then promotion to reusable feature/foundation branches. Fairy/sprite combined checks remain future work.
 
 A successful compile or visible menu alone does not satisfy these runtime gates.
+
+## Automated battle harness v3
+
+The manual v1 fixture is superseded by the controlled type/STAB suite in [battle-tests.md](battle-tests.md). The recovered editing menu remains available. Select **Battle Tests** once; no move or escape inputs are required. **Battle Result** pages through the actual assertion results with Up/Down.
+
+The lifecycle guard now allows the ordinary field parent process and rejects a concurrent child application/task. A rejected launch opens the result screen with failure bit 64 instead of silently doing nothing. Eric confirmed the v2 runtime milestone and subsequent reproducibility/isolation checks. V3 adds exact type/STAB assertions, automatic repeats and a summary; it requires its own runtime acceptance.

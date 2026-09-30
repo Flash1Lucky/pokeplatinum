@@ -1013,5 +1013,6 @@ pokeplatinum_c = files(
     'cutscenes/egg_hatch/main.c',
     'library_tv/library_tv.c',
     'dw_warp/dw_warp.c',
+    'debug_battle.c',
     'debug.c'
 )

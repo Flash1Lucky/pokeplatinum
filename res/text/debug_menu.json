@@ -19,7 +19,7 @@
     },
     {
       "id": "DebugMenu_ItemName_FlagVarList",
-      "en_US": "Flags/Vars \u2192"
+      "en_US": "Flags/Vars →"
     },
     {
       "id": "DebugMenu_ItemName_ToggleCollision",
@@ -70,7 +70,7 @@
       "en_US": [
         "Item: {STRVAR_1 52, 0, 0}\n",
         "{STRVAR_1 8, 1, 0}\n",
-        "\u2190 +{STRVAR_1 52, 2, 0} \u2192"
+        "← +{STRVAR_1 52, 2, 0} →"
       ]
     },
     {
@@ -78,7 +78,7 @@
       "en_US": [
         "Quantity:\n",
         "{STRVAR_1 52, 0, 0}\n",
-        "\u2190 +{STRVAR_1 52, 1, 0} \u2192"
+        "← +{STRVAR_1 52, 1, 0} →"
       ]
     },
     {
@@ -86,7 +86,7 @@
       "en_US": [
         "Flag: {STRVAR_1 52, 0, 0}\n",
         "{STRVAR_1 0, 1, 0}\n",
-        "\u2190 +{STRVAR_1 52, 2, 0} \u2192"
+        "← +{STRVAR_1 52, 2, 0} →"
       ]
     },
     {
@@ -102,7 +102,7 @@
       "en_US": [
         "Var: {STRVAR_1 52, 0, 0}\n",
         "Value: {STRVAR_1 52, 1, 0}\n",
-        "\u2190 +{STRVAR_1 52, 2, 0} \u2192"
+        "← +{STRVAR_1 52, 2, 0} →"
       ]
     },
     {
@@ -110,7 +110,7 @@
       "en_US": [
         "Var: {STRVAR_1 52, 0, 0}\n",
         "New Value: {STRVAR_1 52, 1, 0}\n",
-        "\u2190 +{STRVAR_1 52, 2, 0} \u2192"
+        "← +{STRVAR_1 52, 2, 0} →"
       ]
     },
     {
@@ -124,6 +124,70 @@
     {
       "id": "DebugMenu_Text_ItemsAdded",
       "en_US": "Added {STRVAR_1 52, 0, 0} item(s).\nA: add again.\nB: back."
+    },
+    {
+      "id": "DebugMenu_ItemName_BattleFixture",
+      "en_US": "Battle Tests"
+    },
+    {
+      "id": "DebugMenu_ItemName_BattleResult",
+      "en_US": "Battle Result"
+    },
+    {
+      "id": "DebugMenu_Text_BattlePass",
+      "en_US": "PASS"
+    },
+    {
+      "id": "DebugMenu_Text_BattleFail",
+      "en_US": "FAIL"
+    },
+    {
+      "id": "DebugMenu_Text_BattleXFail",
+      "en_US": "FAIL (probe)"
+    },
+    {
+      "id": "DebugMenu_Text_NoBattleResult",
+      "en_US": "No result yet."
+    },
+    {
+      "id": "DebugMenu_Text_BattleResult",
+      "en_US": "Bits {STRVAR_1 52, 0, 0}\nGot {STRVAR_1 52, 1, 0}\nWant {STRVAR_1 52, 2, 0}\nRepeat {STRVAR_1 52, 3, 0}\nPP {STRVAR_1 52, 4, 0} Exit {STRVAR_1 52, 5, 0}\nUp/Down"
+    },
+    {
+      "en_US": "Done {STRVAR_1 52, 0, 0}/{STRVAR_1 52, 1, 0}\nPass {STRVAR_1 52, 2, 0}\nProbe {STRVAR_1 52, 3, 0}\nFail {STRVAR_1 52, 4, 0}\nRepeat {STRVAR_1 52, 5, 0}\nUp: details",
+      "id": "DebugMenu_Text_BattleSummary"
+    },
+    {
+      "en_US": "Neutral",
+      "id": "DebugMenu_Text_TestNeutral"
+    },
+    {
+      "en_US": "Resisted",
+      "id": "DebugMenu_Text_TestResisted"
+    },
+    {
+      "en_US": "Super",
+      "id": "DebugMenu_Text_TestSuper"
+    },
+    {
+      "en_US": "Immune",
+      "id": "DebugMenu_Text_TestImmune"
+    },
+    {
+      "en_US": "STAB",
+      "id": "DebugMenu_Text_TestStab"
+    },
+    {
+      "en_US": "STAB+Super",
+      "id": "DebugMenu_Text_TestStabSuper"
+    },
+    {
+      "en_US": "85% roll",
+      "id": "DebugMenu_Text_TestLowRoll"
+    },
+    {
+      "en_US": "Fail probe",
+      "id": "DebugMenu_Text_TestProbe"
     }
   ]
 }

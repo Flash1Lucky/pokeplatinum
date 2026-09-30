@@ -21,6 +21,7 @@
 #include "battle/message_defs.h"
 
 #include "communication_system.h"
+#include "debug_battle.h"
 #include "flags.h"
 #include "move_table.h"
 #include "party.h"
@@ -194,6 +195,31 @@ void BattleController_TryRecvLocalMessage(BattleSystem *battleSys, int recipient
 static void SendMessage(BattleSystem *battleSys, int recipient, int battler, void *message, u8 size)
 {
     u8 *data = message;
+
+    // Test-only controller adapter. Submit ordinary server replies instead of
+    // opening an input UI (or asking AI). Do not enqueue a client command that
+    // nobody will acknowledge. All move validation/execution remains vanilla.
+    if (DebugBattle_IsActive() && battleSys->battleType == BATTLE_TYPE_DEBUG
+        && recipient == COMM_RECIPIENT_CLIENT && battler < 2) {
+        int response = 0;
+        switch (*data) {
+        case BATTLE_COMMAND_SET_COMMAND_SELECTION:
+            DebugBattle_RecordCommand(battler);
+            response = battler == BATTLER_PLAYER_1 && battleSys->battleCtx->totalTurns > 0
+                ? PLAYER_INPUT_RUN : PLAYER_INPUT_FIGHT;
+            break;
+        case BATTLE_COMMAND_SHOW_MOVE_SELECT_MENU:
+            response = 1; // Protocol uses one-based move slots.
+            break;
+        case BATTLE_COMMAND_SHOW_TARGET_SELECT_MENU:
+            response = (battler ^ 1) + 1; // Opposing battler, one-based.
+            break;
+        }
+        if (response) {
+            BattleController_SendLocalMessage(battleSys, COMM_RECIPIENT_SERVER, battler, &response, sizeof(response));
+            return;
+        }
+    }
 
     if (battleSys->battleType & BATTLE_TYPE_LINK && (battleSys->battleStatusMask & BATTLE_TYPE_TAG) == FALSE) {
         if (recipient == COMM_RECIPIENT_CLIENT) {
