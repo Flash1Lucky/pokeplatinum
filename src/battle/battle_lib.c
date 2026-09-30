@@ -30,6 +30,7 @@
 
 #include "charcode_util.h"
 #include "comm_manager.h"
+#include "debug_battle.h"
 #include "flags.h"
 #include "heap.h"
 #include "item.h"
@@ -7081,7 +7082,11 @@ int BattleSystem_CalcMoveDamage(BattleSystem *battleSys,
 int BattleSystem_CalcDamageVariance(BattleSystem *battleSys, BattleContext *battleCtx, int damage)
 {
     if (damage) {
-        damage *= (100 - (BattleSystem_RandNext(battleSys) % 16));
+        int percent = 100 - (BattleSystem_RandNext(battleSys) % 16);
+        if (BattleSystem_GetBattleType(battleSys) == BATTLE_TYPE_DEBUG) {
+            percent = DebugBattle_DamagePercent(percent);
+        }
+        damage *= percent;
         damage /= 100;
 
         // Always deal at least 1 damage

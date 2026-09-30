@@ -17,6 +17,7 @@ Static main
 	Library libssl.a (.version)
 	Object main.nef.p/src_main.c.o
 	Object main.nef.p/src_debug.c.o
+	Object main.nef.p/src_debug_battle.c.o
 	Object main.nef.p/src_list_menu.c.o
 	Object main.nef.p/src_game_version.c.o
 	Object main.nef.p/src_menu.c.o
@@ -462,6 +463,7 @@ Overlay overlay5
 	Object main.nef.p/src_overlay005_fieldmap.c.o
 	Object main.nef.p/src_overlay005_ov5_021D1A94.c.o
 	Object main.nef.p/src_overlay005_field_control.c.o
+	Object main.nef.p/src_overlay005_debug_battle_menu.c.o
 	Object main.nef.p/src_overlay005_sprite_resource_manager.c.o
 	Object main.nef.p/src_overlay005_map_prop_animation.c.o
 	Object main.nef.p/src_overlay005_ov5_021D431C.c.o

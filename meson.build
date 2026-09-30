@@ -9,6 +9,8 @@ project('pokeplatinum', ['c', 'cpp', 'nasm'],
 
 fs = import('fs')
 
+configure_file(output: 'battle_tests_config.h', configuration: {'BATTLE_TESTS_BUILD_ENABLED': get_option('battle_tests') ? 1 : 0})
+
 ############################################################
 ###                    INCLUDE PATHS                     ###
 ############################################################

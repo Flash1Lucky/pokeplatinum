@@ -1,3 +1,5 @@
+#include "battle_tests_config.h"
+#include "overlay005/debug_battle_menu.h"
 #include "overlay005/field_control.h"
 
 #include <nitro.h>
@@ -324,6 +326,10 @@ BOOL FieldInput_Process(const FieldInput *input, FieldSystem *fieldSystem)
         }
     }
 
+    if (BATTLE_TESTS_BUILD_ENABLED && input->registeredItem && (input->heldKeys & PAD_BUTTON_R)) {
+        DebugBattleMenu_Open(fieldSystem);
+        return TRUE;
+    }
     if (input->registeredItem && sub_02069238(fieldSystem) == TRUE) {
         return TRUE;
     }

@@ -1,0 +1,69 @@
+{
+  "messages": [
+    {
+      "id": "BattleTests_Text_PlayerName",
+      "en_US": "Debug"
+    },
+    {
+      "id": "BattleTests_Text_BattlePass",
+      "en_US": "PASS"
+    },
+    {
+      "id": "BattleTests_Text_BattleFail",
+      "en_US": "FAIL"
+    },
+    {
+      "id": "BattleTests_Text_BattleXFail",
+      "en_US": "FAIL (probe)"
+    },
+    {
+      "id": "BattleTests_Text_NoBattleResult",
+      "en_US": "No result yet."
+    },
+    {
+      "id": "BattleTests_Text_BattleResult",
+      "en_US": "Bits {STRVAR_1 52, 0, 0}\nGot {STRVAR_1 52, 1, 0}\nWant {STRVAR_1 52, 2, 0}\nRepeat {STRVAR_1 52, 3, 0}\nPP {STRVAR_1 52, 4, 0} Exit {STRVAR_1 52, 5, 0}\nUp/Down"
+    },
+    {
+      "en_US": "Done {STRVAR_1 52, 0, 0}/{STRVAR_1 52, 1, 0}\nPass {STRVAR_1 52, 2, 0}\nProbe {STRVAR_1 52, 3, 0}\nFail {STRVAR_1 52, 4, 0}\nRepeat {STRVAR_1 52, 5, 0}\nUp: details",
+      "id": "BattleTests_Text_BattleSummary"
+    },
+    {
+      "en_US": "Neutral",
+      "id": "BattleTests_Text_TestNeutral"
+    },
+    {
+      "en_US": "Resisted",
+      "id": "BattleTests_Text_TestResisted"
+    },
+    {
+      "en_US": "Super",
+      "id": "BattleTests_Text_TestSuper"
+    },
+    {
+      "en_US": "Immune",
+      "id": "BattleTests_Text_TestImmune"
+    },
+    {
+      "en_US": "STAB",
+      "id": "BattleTests_Text_TestStab"
+    },
+    {
+      "en_US": "STAB+Super",
+      "id": "BattleTests_Text_TestStabSuper"
+    },
+    {
+      "en_US": "85% roll",
+      "id": "BattleTests_Text_TestLowRoll"
+    },
+    {
+      "en_US": "Fail probe",
+      "id": "BattleTests_Text_TestProbe"
+    },
+    {
+      "en_US": "A: run suite   B: close",
+      "id": "BattleTests_Text_Controls"
+    }
+  ],
+  "key": 0
+}
