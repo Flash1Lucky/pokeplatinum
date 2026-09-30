@@ -66,3 +66,5 @@ A successful compile or visible menu alone does not satisfy these runtime gates.
 The manual v1 fixture is superseded by the controlled type/STAB suite in [battle-tests.md](battle-tests.md). The recovered editing menu remains available. Select **Battle Tests** once; no move or escape inputs are required. **Battle Result** pages through the actual assertion results with Up/Down.
 
 The lifecycle guard now allows the ordinary field parent process and rejects a concurrent child application/task. A rejected launch opens the result screen with failure bit 64 instead of silently doing nothing. Eric confirmed the v2 runtime milestone and subsequent reproducibility/isolation checks. V3 adds exact type/STAB assertions, automatic repeats and a summary; it requires its own runtime acceptance.
+
+Eric confirmed v3's eight cases: seven passes and one expected failure probe. Checkpoint: 057757266. The next validation builds separate battle_tests from debug_menu; see battle-tests-extraction.md. No foundation promotion has occurred.

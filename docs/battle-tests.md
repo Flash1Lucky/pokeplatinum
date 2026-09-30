@@ -78,3 +78,7 @@ Not implemented: arbitrary multi-turn actions, doubles, switching/capture, scene
 - V3 final build and emulator acceptance remain pending until recorded. Disabled build/behavior and minimal/combined extraction remain separate later gates. Codex has not launched or controlled the emulator.
 
 - V3 build completed all 13 steps in 203.079 seconds. Preserved ROM SHA-1: f9cb71b373b454de84f3c37a7212681a58be5213. Eric confirmed eight cases: seven passes and one FAIL (probe). These statuses require the automatic comparisons and assertions to pass (apart from the deliberate bit-8 failure).
+
+## Extraction follow-up
+
+The next-stage standalone build option and R+Y window are implemented. See [battle-tests-extraction.md](battle-tests-extraction.md) for the current dependency contract, build matrix and pending acceptance. This supersedes the earlier statement that a dedicated build option is future work. V3 remains the last user-validated ROM; extraction UI/build combinations are not yet validated.

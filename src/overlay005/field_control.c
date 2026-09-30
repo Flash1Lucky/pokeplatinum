@@ -17,6 +17,8 @@
 #include "field/field_system_sub2_t.h"
 #include "overlay005/daycare.h"
 #include "overlay005/debug_menu.h"
+#include "overlay005/debug_battle_menu.h"
+#include "battle_tests_config.h"
 #include "overlay005/honey_tree.h"
 #include "overlay005/ov5_021DFB54.h"
 #include "overlay005/ov5_021E1154.h"
@@ -341,6 +343,11 @@ BOOL FieldInput_Process(const FieldInput *input, FieldSystem *fieldSystem)
             Field_TrySetMapConnection(fieldSystem);
             return TRUE;
         }
+    }
+
+    if (BATTLE_TESTS_BUILD_ENABLED && input->registeredItem && (input->heldKeys & PAD_BUTTON_R)) {
+        DebugBattleMenu_Open(fieldSystem);
+        return TRUE;
     }
 
     if (input->registeredItem && sub_02069238(fieldSystem) == TRUE) {

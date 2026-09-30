@@ -22,6 +22,7 @@
 #include "camera.h"
 #include "debug.h"
 #include "debug_battle.h"
+#include "overlay005/debug_battle_menu.h"
 #include "field_map_change.h"
 #include "field_system.h"
 #include "item.h"
@@ -1192,39 +1193,5 @@ static void DebugFunction_BattleResult(SysTask *task, DebugMenu *menu)
 
 static void SubMenuRender_BattleResult(DebugSubMenu *subMenu)
 {
-    Window_FillTilemap(subMenu->window, DEBUG_COLOR_WHITE);
-    if (subMenu->value == 0) {
-        DebugBattleSummary summary = DebugBattle_GetSummary();
-        u32 status = DebugMenu_Text_NoBattleResult;
-        if (summary.failed) status = DebugMenu_Text_BattleFail;
-        else if (summary.completed == DEBUG_BATTLE_CASE_COUNT && summary.repeats == DEBUG_BATTLE_CASE_COUNT) status = DebugMenu_Text_BattlePass;
-        DebugSubMenu_PrintString(subMenu, status, 0, 0, TEXT_SPEED_INSTANT, DEBUG_TEXT_BLACK);
-        StringTemplate_SetNumber(subMenu->template, 0, summary.completed, 2, PADDING_MODE_NONE, CHARSET_MODE_EN);
-        StringTemplate_SetNumber(subMenu->template, 1, DEBUG_BATTLE_CASE_COUNT, 2, PADDING_MODE_NONE, CHARSET_MODE_EN);
-        StringTemplate_SetNumber(subMenu->template, 2, summary.passed, 2, PADDING_MODE_NONE, CHARSET_MODE_EN);
-        StringTemplate_SetNumber(subMenu->template, 3, summary.probes, 2, PADDING_MODE_NONE, CHARSET_MODE_EN);
-        StringTemplate_SetNumber(subMenu->template, 4, summary.failed, 2, PADDING_MODE_NONE, CHARSET_MODE_EN);
-        StringTemplate_SetNumber(subMenu->template, 5, summary.repeats, 2, PADDING_MODE_NONE, CHARSET_MODE_EN);
-        DebugSubMenu_PrintString(subMenu, DebugMenu_Text_BattleSummary, 0, 16, TEXT_SPEED_INSTANT, DEBUG_TEXT_BLACK);
-        return;
-    }
-    int index = subMenu->value - 1;
-    const DebugBattleResult *result = DebugBattle_GetResult(index);
-    if (!result->valid) {
-        DebugSubMenu_PrintString(subMenu, DebugMenu_Text_NoBattleResult, 0, 0, TEXT_SPEED_INSTANT, DEBUG_TEXT_BLACK);
-        return;
-    }
-    u32 status = result->failures == 0 ? DebugMenu_Text_BattlePass : DebugMenu_Text_BattleFail;
-    if (result->expectedFailures) {
-        status = result->failures == result->expectedFailures ? DebugMenu_Text_BattleXFail : DebugMenu_Text_BattleFail;
-    }
-    DebugSubMenu_PrintString(subMenu, status, 0, 0, TEXT_SPEED_INSTANT, DEBUG_TEXT_BLACK);
-    DebugSubMenu_PrintString(subMenu, DebugBattle_GetCaseName(index), 0, 16, TEXT_SPEED_INSTANT, DEBUG_TEXT_BLACK);
-    StringTemplate_SetNumber(subMenu->template, 0, result->failures, 3, PADDING_MODE_NONE, CHARSET_MODE_EN);
-    StringTemplate_SetNumber(subMenu->template, 1, result->damage, 3, PADDING_MODE_NONE, CHARSET_MODE_EN);
-    StringTemplate_SetNumber(subMenu->template, 2, DebugBattle_GetExpectedDamage(index), 3, PADDING_MODE_NONE, CHARSET_MODE_EN);
-    StringTemplate_SetNumber(subMenu->template, 3, result->repeatMatched, 1, PADDING_MODE_NONE, CHARSET_MODE_EN);
-    StringTemplate_SetNumber(subMenu->template, 4, result->playerPP, 2, PADDING_MODE_NONE, CHARSET_MODE_EN);
-    StringTemplate_SetNumber(subMenu->template, 5, result->result, 2, PADDING_MODE_NONE, CHARSET_MODE_EN);
-    DebugSubMenu_PrintString(subMenu, DebugMenu_Text_BattleResult, 0, 32, TEXT_SPEED_INSTANT, DEBUG_TEXT_BLACK);
+    DebugBattleMenu_Render(subMenu->window, subMenu->value);
 }

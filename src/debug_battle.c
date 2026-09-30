@@ -1,6 +1,6 @@
 #include "debug_battle.h"
 
-#include "constants/debug_menu.h"
+#include "battle_tests_config.h"
 #include "constants/heap.h"
 #include "constants/narc.h"
 #include "constants/overworld_weather.h"
@@ -34,7 +34,7 @@
 #include "trainer_info.h"
 #include "unk_0203D1B8.h"
 
-#include "res/text/bank/debug_menu.h"
+#include "res/text/bank/battle_tests.h"
 
 typedef struct DebugBattleEnv {
     FieldBattleDTO *dto;
@@ -72,14 +72,14 @@ typedef struct DebugBattleCase {
 // Level 50, power 60, SpAtk = SpDef = 100: floor(22 * 60 / 50) + 2 = 28.
 // Expectations are constants, never derived from the engine's type chart.
 static const DebugBattleCase sCases[DEBUG_BATTLE_CASE_COUNT] = {
-    { SPECIES_ABRA, SPECIES_SNORLAX, MOVE_SHOCK_WAVE, 100, 28, DebugMenu_Text_TestNeutral, DEBUG_BATTLE_SEED, 0 },
-    { SPECIES_ABRA, SPECIES_BULBASAUR, MOVE_SHOCK_WAVE, 100, 14, DebugMenu_Text_TestResisted, DEBUG_BATTLE_SEED, 0 },
-    { SPECIES_ABRA, SPECIES_SQUIRTLE, MOVE_SHOCK_WAVE, 100, 56, DebugMenu_Text_TestSuper, DEBUG_BATTLE_SEED, 0 },
-    { SPECIES_ABRA, SPECIES_GEODUDE, MOVE_SHOCK_WAVE, 100, 0, DebugMenu_Text_TestImmune, DEBUG_BATTLE_SEED, 0 },
-    { SPECIES_PIKACHU, SPECIES_SNORLAX, MOVE_SHOCK_WAVE, 100, 42, DebugMenu_Text_TestStab, DEBUG_BATTLE_SEED, 0 },
-    { SPECIES_PIKACHU, SPECIES_SQUIRTLE, MOVE_SHOCK_WAVE, 100, 84, DebugMenu_Text_TestStabSuper, DEBUG_BATTLE_SEED, 0 },
-    { SPECIES_ABRA, SPECIES_SNORLAX, MOVE_SHOCK_WAVE, 85, 23, DebugMenu_Text_TestLowRoll, DEBUG_BATTLE_SEED, 0 },
-    { SPECIES_ABRA, SPECIES_SNORLAX, MOVE_SHOCK_WAVE, 100, 0, DebugMenu_Text_TestProbe, DEBUG_BATTLE_SEED, DEBUG_BATTLE_FAIL_DAMAGE },
+    { SPECIES_ABRA, SPECIES_SNORLAX, MOVE_SHOCK_WAVE, 100, 28, BattleTests_Text_TestNeutral, DEBUG_BATTLE_SEED, 0 },
+    { SPECIES_ABRA, SPECIES_BULBASAUR, MOVE_SHOCK_WAVE, 100, 14, BattleTests_Text_TestResisted, DEBUG_BATTLE_SEED, 0 },
+    { SPECIES_ABRA, SPECIES_SQUIRTLE, MOVE_SHOCK_WAVE, 100, 56, BattleTests_Text_TestSuper, DEBUG_BATTLE_SEED, 0 },
+    { SPECIES_ABRA, SPECIES_GEODUDE, MOVE_SHOCK_WAVE, 100, 0, BattleTests_Text_TestImmune, DEBUG_BATTLE_SEED, 0 },
+    { SPECIES_PIKACHU, SPECIES_SNORLAX, MOVE_SHOCK_WAVE, 100, 42, BattleTests_Text_TestStab, DEBUG_BATTLE_SEED, 0 },
+    { SPECIES_PIKACHU, SPECIES_SQUIRTLE, MOVE_SHOCK_WAVE, 100, 84, BattleTests_Text_TestStabSuper, DEBUG_BATTLE_SEED, 0 },
+    { SPECIES_ABRA, SPECIES_SNORLAX, MOVE_SHOCK_WAVE, 85, 23, BattleTests_Text_TestLowRoll, DEBUG_BATTLE_SEED, 0 },
+    { SPECIES_ABRA, SPECIES_SNORLAX, MOVE_SHOCK_WAVE, 100, 0, BattleTests_Text_TestProbe, DEBUG_BATTLE_SEED, DEBUG_BATTLE_FAIL_DAMAGE },
 };
 static BOOL DebugBattle_Task(FieldTask *task);
 
@@ -121,7 +121,7 @@ static void DebugBattle_AddMon(FieldBattleDTO *dto, int battler, int species, u3
 
 BOOL DebugBattle_Start(FieldSystem *fieldSystem)
 {
-    if (!DEBUG_MENU_ENABLED || sActive || FieldSystem_IsRunningTask(fieldSystem)
+    if (!BATTLE_TESTS_BUILD_ENABLED || sActive || FieldSystem_IsRunningTask(fieldSystem)
         || FieldSystem_HasChildProcess(fieldSystem)
         || !FieldSystem_IsRunningFieldMap(fieldSystem)) {
         if (!sActive) {
@@ -157,8 +157,8 @@ BOOL DebugBattle_Start(FieldSystem *fieldSystem)
     TrainerInfo_SetID(trainer, 0x1234);
     TrainerInfo_SetGender(trainer, GENDER_MALE);
     trainer->badgeMask = 0xFF;
-    MessageLoader *loader = MessageLoader_Init(MSG_LOADER_LOAD_ON_DEMAND, NARC_INDEX_MSGDATA__PL_MSG, TEXT_BANK_DEBUG_MENU, HEAP_ID_FIELD2);
-    String *name = MessageLoader_GetNewString(loader, DebugMenu_Text_PlayerName);
+    MessageLoader *loader = MessageLoader_Init(MSG_LOADER_LOAD_ON_DEMAND, NARC_INDEX_MSGDATA__PL_MSG, TEXT_BANK_BATTLE_TESTS, HEAP_ID_FIELD2);
+    String *name = MessageLoader_GetNewString(loader, BattleTests_Text_PlayerName);
     TrainerInfo_SetNameFromString(trainer, name);
     String_Free(name);
     MessageLoader_Free(loader);
@@ -281,7 +281,7 @@ const DebugBattleResult *DebugBattle_GetResult(int index)
 
 BOOL DebugBattle_IsActive(void)
 {
-    return DEBUG_MENU_ENABLED && sActive;
+    return BATTLE_TESTS_BUILD_ENABLED && sActive;
 }
 
 void DebugBattle_RecordCommand(int battler)

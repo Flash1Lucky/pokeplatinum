@@ -447,6 +447,7 @@ pokeplatinum_c = files(
     'overlay005/field_effect_renderer.c',
     'overlay006/ov6_0223E140.c',
     'overlay005/debug_menu.c',
+    'overlay005/debug_battle_menu.c',
     'overlay005/debug_mon_menu.c',
     'overlay006/wild_encounters.c',
     'overlay006/great_marsh_lookout_sprite.c',

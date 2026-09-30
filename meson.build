@@ -10,6 +10,11 @@ project('pokeplatinum', ['c', 'cpp', 'nasm'],
 fs = import('fs')
 
 configure_file(
+    output: 'battle_tests_config.h',
+    configuration: {'BATTLE_TESTS_BUILD_ENABLED': get_option('battle_tests') ? 1 : 0},
+)
+
+configure_file(
     output: 'debug_menu_config.h',
     configuration: {'DEBUG_MENU_BUILD_ENABLED': get_option('debug_menu') ? 1 : 0},
 )
