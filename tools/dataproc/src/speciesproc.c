@@ -1425,7 +1425,7 @@ static int pack_dexdata(nitroarc_packer_t *p) {
 
     // Indices of species by their types
     for (size_t i = 0; i < NUM_POKEMON_TYPES; i++) {
-        if (i == TYPE_MYSTERY) continue; // NOTE: The Mystery type is not packed
+        if (i == TYPE_MYSTERY || i == TYPE_FAIRY) continue; // Fairy is appended below; preserve legacy member IDs.
         nitroarc_ppack(p, indexed_by_type[i], count_by_type[i] * sizeof(**indexed_by_type), NULL);
     }
 
@@ -1433,6 +1433,8 @@ static int pack_dexdata(nitroarc_packer_t *p) {
     for (size_t i = 0; i < NUM_BODY_SHAPES; i++) {
         nitroarc_ppack(p, indexed_by_shape[i], count_by_shape[i] * sizeof(**indexed_by_shape), NULL);
     }
+
+    nitroarc_ppack(p, indexed_by_type[TYPE_FAIRY], count_by_type[TYPE_FAIRY] * sizeof(**indexed_by_type), NULL);
 
     free(sortables_copy);
     free(sorted_species);

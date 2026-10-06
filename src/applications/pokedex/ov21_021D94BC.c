@@ -1081,40 +1081,14 @@ static void ov21_021DA18C(u32 param0, enum TouchScreenButtonState param1, void *
 
 static void ov21_021DA1C8(UnkStruct_ov21_021D9B24 *param0, UnkStruct_ov21_021D95B8 *param1, enum HeapID heapID)
 {
-    int v0, v1;
-    int v2, v3;
-
-    param0->unk_0C = Heap_Alloc(heapID, sizeof(TouchScreenHitTable) * 10);
-
-    for (v0 = 0; v0 < 4; v0++) {
-        v3 = 16 + (v0 * (48 - 16));
-
-        for (v1 = 0; v1 < 2; v1++) {
-            v2 = 48 + (v1 * (128 - 48));
-            PokedexMain_SetHitTableRect(&param0->unk_0C[(v0 * 2) + v1], v3 - (32 / 2), v3 + (32 / 2), v2 - (80 / 2), v2 + (80 / 2));
-        }
-    }
-
-    v3 = 144;
-    v2 = 128;
-
-    PokedexMain_SetHitTableRect(&param0->unk_0C[8], v3 - (32 / 2), v3 + (32 / 2), v2 - (80 / 2), v2 + (80 / 2));
-
-    v3 = 176;
-    v2 = (48 - 24);
-
-    PokedexMain_SetHitTableRect(&param0->unk_0C[9], v3 - (32 / 2), v3 + (32 / 2), v2 - (32 / 2), v2 + (32 / 2));
-
-    param0->unk_10.unk_00 = param1;
-    param0->unk_10.unk_04 = param0;
-    param0->unk_08 = TouchScreenActions_RegisterHandler(param0->unk_0C, 10, ov21_021DA2C0, &param0->unk_10, heapID);
+    ov21_021DA018(param0, param1, heapID);
 }
 
 static void ov21_021DA280(UnkStruct_ov21_021D9B24 *param0, UnkStruct_ov21_021D95B8 *param1)
 {
     int v0;
 
-    for (v0 = 0; v0 < 10; v0++) {
+    for (v0 = 0; v0 < 11; v0++) {
         param0->unk_44[v0] = 3;
     }
 
@@ -1191,6 +1165,11 @@ static void ov21_021DA308(UnkStruct_ov21_021D9B24 *param0, int param1)
     case 17:
         if (param0->unk_44[7] != 2) {
             param0->unk_44[7] = 1;
+        }
+        break;
+    case FT_FAIRY:
+        if (param0->unk_44[8] != 2) {
+            param0->unk_44[8] = 1;
         }
         break;
     default:
@@ -1809,164 +1788,12 @@ static void ov21_021DAC08(UnkStruct_ov21_021D9B24 *param0, UnkStruct_ov21_021D95
 
 static void ov21_021DAD74(UnkStruct_ov21_021D9B24 *param0, enum HeapID heapID)
 {
-    int v0, v1;
-    int v2, v3;
-    int v4, v5;
-    int v6, v7;
-    int v8;
-
-    param0->unk_1C = Heap_Alloc(heapID, sizeof(PokedexCursorData) * (3 * 6));
-
-    for (v0 = 0; v0 < 6; v0++) {
-        v3 = 16 + (v0 * (48 - 16));
-
-        for (v1 = 0; v1 < 3; v1++) {
-            v2 = 48 + (v1 * (128 - 48));
-            v8 = 6 + (v0 * 2) + v1;
-
-            switch (v0) {
-            case 0:
-                if (v1 == (3 - 1)) {
-                    v8 = 0;
-                } else {
-                    v6 = 0;
-                    v7 = 0;
-                    v4 = 60;
-                    v5 = 16;
-                }
-                break;
-            case 1:
-                if (v1 == (3 - 1)) {
-                    v8 = 1;
-                } else {
-                    v6 = 0;
-                    v7 = 0;
-                    v4 = 60;
-                    v5 = 16;
-                }
-                break;
-            case 2:
-                if (v1 == (3 - 1)) {
-                    v8 = 2;
-                } else {
-                    v6 = 0;
-                    v7 = 0;
-                    v4 = 60;
-                    v5 = 16;
-                }
-                break;
-            case 3:
-                if (v1 == (3 - 1)) {
-                    v8 = 3;
-                } else {
-                    v6 = 0;
-                    v7 = 0;
-                    v4 = 60;
-                    v5 = 16;
-                }
-                break;
-            case 4:
-                if (v1 == (3 - 1)) {
-                    v8 = 4;
-                } else {
-                    if (v1 == 0) {
-                        v6 = 1;
-                        v7 = 2;
-                        v4 = 60;
-                        v5 = 16;
-                    } else {
-                        v6 = 0;
-                        v7 = 0;
-                        v4 = 60;
-                        v5 = 16;
-                    }
-                }
-                break;
-            case 5:
-                if (v1 == (3 - 1)) {
-                    v8 = 5;
-                } else {
-                    if (v1 == 0) {
-                        v6 = 0;
-                        v7 = 0;
-                        v4 = 16;
-                        v5 = 16;
-                        v2 = (48 - 24);
-                    } else {
-                        v6 = 1;
-                        v7 = 1;
-                        v4 = 60;
-                        v5 = 16;
-                    }
-                }
-                break;
-            }
-
-            if (v1 < (3 - 1)) {
-                PokedexPanel_InitCursorData(&param0->unk_1C[(v0 * 3) + v1], v2, v3, v4, v5, v6, v7, v8);
-            } else {
-                ov21_021DA534(&param0->unk_1C[(v0 * 3) + v1], v8);
-            }
-        }
-    }
-
-    param0->unk_18 = PokedexPanel_Alloc(heapID);
-    PokedexPanel_New(param0->unk_18, param0->unk_1C, 3, 6);
+    ov21_021DAAD4(param0, heapID);
 }
 
 static void ov21_021DAED8(UnkStruct_ov21_021D9B24 *param0, UnkStruct_ov21_021D95B8 *param1)
 {
-    if (gSystem.heldKeys & PAD_BUTTON_A) {
-        if (param0->unk_8C == 0) {
-            switch (PokedexPanel_GetCurrentButton(param0->unk_18)) {
-            case 6:
-                param0->unk_84 = 0;
-                param0->unk_44[param0->unk_84] = 2;
-                break;
-            case 7:
-                param0->unk_84 = 1;
-                param0->unk_44[param0->unk_84] = 2;
-                break;
-            case 8:
-                param0->unk_84 = 2;
-                param0->unk_44[param0->unk_84] = 2;
-                break;
-            case 9:
-                param0->unk_84 = 3;
-                param0->unk_44[param0->unk_84] = 2;
-                break;
-            case 10:
-                param0->unk_84 = 4;
-                param0->unk_44[param0->unk_84] = 2;
-                break;
-            case 11:
-                param0->unk_84 = 5;
-                param0->unk_44[param0->unk_84] = 2;
-                break;
-            case 12:
-                param0->unk_84 = 6;
-                param0->unk_44[param0->unk_84] = 2;
-                break;
-            case 13:
-                param0->unk_84 = 7;
-                param0->unk_44[param0->unk_84] = 2;
-                break;
-            case 15:
-                param0->unk_84 = 8;
-                param0->unk_44[param0->unk_84] = 2;
-                param0->unk_8C = 1;
-                break;
-            case 16:
-                param0->unk_84 = 9;
-                param0->unk_44[param0->unk_84] = 2;
-                break;
-            default:
-                break;
-            }
-        }
-    } else {
-        param0->unk_8C = 0;
-    }
+    ov21_021DAC08(param0, param1);
 }
 
 static void ov21_021DB02C(UnkStruct_ov21_021D9B24 *param0, enum HeapID heapID)
@@ -2532,35 +2359,8 @@ static void ov21_021DBA24(UnkStruct_ov21_021DC96C *param0, SpriteListTemplate *p
 
 static void ov21_021DBAB8(UnkStruct_ov21_021DC96C *param0, SpriteListTemplate *param1)
 {
-    int v0, v1;
-
-    for (v0 = 0; v0 < 4; v0++) {
-        param1->position.y = 16 + (v0 * (48 - 16));
-        param1->position.y = (param1->position.y << FX32_SHIFT) + (192 << FX32_SHIFT);
-
-        for (v1 = 0; v1 < 2; v1++) {
-            param1->position.x = 48 + (v1 * (128 - 48));
-            param1->position.x <<= FX32_SHIFT;
-            param0->unk_30[(v0 * 2) + v1] = SpriteList_Add(param1);
-            Sprite_SetAnim(param0->unk_30[(v0 * 2) + v1], 0);
-        }
-    }
-
-    param1->position.y = 144;
-    param1->position.x = 128;
-    param1->position.x <<= FX32_SHIFT;
-    param1->position.y = (param1->position.y << FX32_SHIFT) + (192 << FX32_SHIFT);
-    param0->unk_30[8] = SpriteList_Add(param1);
-
-    Sprite_SetAnim(param0->unk_30[8], 0);
-
-    param1->position.y = 176;
-    param1->position.x = (48 - 24);
-    param1->position.x <<= FX32_SHIFT;
-    param1->position.y = (param1->position.y << FX32_SHIFT) + (192 << FX32_SHIFT);
-    param0->unk_30[9] = SpriteList_Add(param1);
-
-    Sprite_SetAnim(param0->unk_30[9], 4);
+    ov21_021DBA24(param0, param1);
+    Sprite_SetAnim(param0->unk_30[10], 4);
 }
 
 static void ov21_021DBB74(UnkStruct_ov21_021DC96C *param0, SpriteListTemplate *param1)
@@ -2999,7 +2799,7 @@ static void ov21_021DC2A4(UnkStruct_ov21_021DC96C *param0, PokedexDisplayBox *di
 
     v1 = PlttTransfer_GetPlttOffset(displayBox->paletteProxy, NNS_G2D_VRAM_TYPE_2DSUB);
 
-    for (v2 = 0; v2 < 9; v2++) {
+    for (v2 = 0; v2 < 10; v2++) {
         v0 = PokedexTextManager_NewWindow(textMan, 10, 2);
 
         switch (v2) {
@@ -3028,6 +2828,9 @@ static void ov21_021DC2A4(UnkStruct_ov21_021DC96C *param0, PokedexDisplayBox *di
             entryID = pl_msg_pokedex_dark;
             break;
         case 8:
+            entryID = pl_msg_pokedex_fairy;
+            break;
+        case 9:
             entryID = pl_msg_pokedex_nonetype;
             break;
         }
@@ -3293,9 +3096,12 @@ static void ov21_021DC600(UnkStruct_ov21_021D9B24 *param0, UnkStruct_ov21_021D95
         v0 = 17;
         break;
     case 8:
-        v0 = 0;
+        v0 = FT_FAIRY;
         break;
     case 9:
+        v0 = 0;
+        break;
+    case 10:
         param0->unk_20 = 0;
         Sound_PlayEffect(SEQ_SE_DP_DECIDE_sseq);
         break;
@@ -3506,7 +3312,7 @@ static void ov21_021DC93C(UnkStruct_ov21_021DC96C *param0, int param1)
     int v0;
 
     for (v0 = 0; v0 < 15; v0++) {
-        if (v0 != 9) {
+        if (v0 != 10) {
             if (param0->unk_30[v0]) {
                 Sprite_SetExplicitOAMMode(param0->unk_30[v0], param1);
             }

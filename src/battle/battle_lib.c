@@ -2506,6 +2506,20 @@ static const u8 sTypeMatchupMultipliers[][3] = {
     { TYPE_STEEL, TYPE_ROCK, TYPE_MULTI_SUPER_EFF },
     { TYPE_STEEL, TYPE_STEEL, TYPE_MULTI_NOT_VERY_EFF },
 
+    // Fairy is appended; existing matchups and Foresight semantics stay intact.
+    { TYPE_FIGHTING, TYPE_FAIRY, TYPE_MULTI_NOT_VERY_EFF },
+    { TYPE_BUG, TYPE_FAIRY, TYPE_MULTI_NOT_VERY_EFF },
+    { TYPE_DARK, TYPE_FAIRY, TYPE_MULTI_NOT_VERY_EFF },
+    { TYPE_DRAGON, TYPE_FAIRY, TYPE_MULTI_IMMUNE },
+    { TYPE_POISON, TYPE_FAIRY, TYPE_MULTI_SUPER_EFF },
+    { TYPE_STEEL, TYPE_FAIRY, TYPE_MULTI_SUPER_EFF },
+    { TYPE_FAIRY, TYPE_FIGHTING, TYPE_MULTI_SUPER_EFF },
+    { TYPE_FAIRY, TYPE_DRAGON, TYPE_MULTI_SUPER_EFF },
+    { TYPE_FAIRY, TYPE_DARK, TYPE_MULTI_SUPER_EFF },
+    { TYPE_FAIRY, TYPE_FIRE, TYPE_MULTI_NOT_VERY_EFF },
+    { TYPE_FAIRY, TYPE_POISON, TYPE_MULTI_NOT_VERY_EFF },
+    { TYPE_FAIRY, TYPE_STEEL, TYPE_MULTI_NOT_VERY_EFF },
+
     { 0xFE, 0xFE, TYPE_MULTI_IMMUNE },
 
     // These values are separated from the remainder of the table to support
@@ -6544,6 +6558,7 @@ static const ItemEffectTypePair sTypeBoostingItems[] = {
     { HOLD_EFFECT_ARCEUS_GHOST, TYPE_GHOST },
     { HOLD_EFFECT_ARCEUS_DRAGON, TYPE_DRAGON },
     { HOLD_EFFECT_ARCEUS_DARK, TYPE_DARK },
+    { HOLD_EFFECT_ARCEUS_FAIRY, TYPE_FAIRY },
     { HOLD_EFFECT_ARCEUS_STEEL, TYPE_STEEL }
 };
 
@@ -7689,6 +7704,10 @@ static u8 Battler_MonType(BattleContext *battleCtx, int battler, enum BattleMonP
             type = TYPE_DARK;
             break;
 
+        case HOLD_EFFECT_ARCEUS_FAIRY:
+            type = TYPE_FAIRY;
+            break;
+
         case HOLD_EFFECT_ARCEUS_STEEL:
             type = TYPE_STEEL;
             break;
@@ -7870,6 +7889,9 @@ static int CalcMoveType(BattleSystem *battleSys, BattleContext *battleCtx, int i
             break;
         case HOLD_EFFECT_ARCEUS_DARK:
             type = TYPE_DARK;
+            break;
+        case HOLD_EFFECT_ARCEUS_FAIRY:
+            type = TYPE_FAIRY;
             break;
         default:
             type = TYPE_NORMAL;
@@ -8152,6 +8174,9 @@ int Move_CalcVariableType(BattleSystem *battleSys, BattleContext *battleCtx, Pok
             break;
         case HOLD_EFFECT_ARCEUS_DARK:
             type = TYPE_DARK;
+            break;
+        case HOLD_EFFECT_ARCEUS_FAIRY:
+            type = TYPE_FAIRY;
             break;
         default:
             type = TYPE_NORMAL;

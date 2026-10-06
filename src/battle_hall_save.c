@@ -76,6 +76,10 @@ u32 BattleHallSave_GetMember(BattleHallSave *save, u8 field, u8 index, u8 unused
 
 u8 BattleHall_GetRankOfType(u8 idx, u8 *typeRanks)
 {
+    if (idx >= HALL_NUM_TYPES) {
+        return 0;
+    }
+
     u8 byte = idx / 2;
     u8 nybble = idx % 2;
     u8 rank = (typeRanks[byte] >> (4 * nybble)) & 0xf;
@@ -85,6 +89,10 @@ u8 BattleHall_GetRankOfType(u8 idx, u8 *typeRanks)
 
 void BattleHall_SetRankOfType(u8 pokemonType, u8 *typeRanks, u8 value)
 {
+    if (pokemonType >= HALL_NUM_TYPES) {
+        return;
+    }
+
     u8 byte = pokemonType / 2;
     u8 nybble = pokemonType % 2;
 
@@ -100,7 +108,7 @@ void BattleHall_SetRankOfType(u8 pokemonType, u8 *typeRanks, u8 value)
 
 void BattleHall_ResetRankOfAllTypes(u8 *typeRanks)
 {
-    for (int i = 0; i < NUM_POKEMON_TYPES; i++) {
+    for (int i = 0; i < HALL_NUM_TYPES; i++) {
         BattleHall_SetRankOfType(i, typeRanks, 0);
     }
 }

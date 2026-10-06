@@ -81,3 +81,11 @@ otherpoke_index += {
 }
 
 pokefoot_files += files('footprint.png')
+
+# Appended separately to preserve every original archive member ID.
+arceus_fairy_files = files(
+    'forms/fairy/back.png',
+    'forms/fairy/front.png',
+    'forms/fairy/normal.pal',
+    'forms/fairy/shiny.pal',
+)

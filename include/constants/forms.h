@@ -98,7 +98,11 @@
 #define SHAYMIN_FORM_SKY   1
 #define SHAYMIN_FORM_COUNT 2
 
-#define ARCEUS_FORM_COUNT 18
+#define ARCEUS_FORM_COUNT 19
+
+// Appended after all 253 original pl_otherpoke entries, including shadows.
+#define ARCEUS_FAIRY_SPRITE_BACK 253
+#define ARCEUS_FAIRY_PALETTE_NORMAL 255
 
 #define EGG_FORM_BASE    0
 #define EGG_FORM_MANAPHY 1

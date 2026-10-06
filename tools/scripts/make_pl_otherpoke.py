@@ -26,6 +26,8 @@ argparser.add_argument('-se', '--sprite-entries',
 argparser.add_argument('-pe', '--palette-entries',
                        required=True, type=int,
                        help='Number of entries to interpret from the list as NCLR-sources')
+argparser.add_argument('--append-files', nargs=4, default=None,
+                       help='Additional back/front/normal/shiny assets appended after original members')
 argparser.add_argument('files',
                        nargs='+',
                        help='List of files to process in-order')
@@ -106,6 +108,15 @@ subprocess.run([
     '-nopad',
     '-comp', '10'
 ])
+
+# The zz prefix sorts after both original pokemon_shadows members.
+if args.append_files:
+    for infile, name in zip(args.append_files, [
+        'zz_arceus_fairy_back.NCGR', 'zz_arceus_fairy_front.NCGR',
+        'zz_arceus_fairy_normal.NCLR', 'zz_arceus_fairy_shiny.NCLR',
+    ]):
+        flags = ['-encodefronttoback', '-scan'] if name.endswith('.NCGR') else ['-bitdepth', '8', '-nopad', '-comp', '10']
+        subprocess.run([args.nitrogfx, infile, private_dir / name, *flags], check=True)
 
 subprocess.run([
     args.narc,
