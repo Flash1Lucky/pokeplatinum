@@ -36,6 +36,29 @@
 
 #include "res/text/bank/battle_tests.h"
 
+
+// Opt-in emulator output only. No save writes or general game logging.
+// melonDS 1.1 consumes up to 120 bytes synchronously at this no$gba register.
+#if BATTLE_TESTS_LOG_ENABLED
+static void DebugBattle_Log(const char *format, ...)
+{
+    // The emulator reads main RAM directly; do not expose a possible DTCM stack buffer.
+    // Calls are confined to the serial field task, never an interrupt.
+    static char line[120];
+    va_list args;
+    va_start(args, format);
+    int length = OS_VSNPrintf(line, sizeof(line), format, args);
+    va_end(args);
+    if (length < 0 || length >= sizeof(line)) {
+        *(const char *volatile *)0x04FFFA18 = "BTEST1 ERROR truncated";
+        return;
+    }
+    *(const char *volatile *)0x04FFFA18 = line;
+}
+#else
+#define DebugBattle_Log(...)
+#endif
+
 typedef struct DebugBattleEnv {
     FieldBattleDTO *dto;
     GameRecords records;
@@ -175,6 +198,7 @@ BOOL DebugBattle_Start(FieldSystem *fieldSystem)
     dto->mapEvolutionMethod = 0;
     dto->seed = DEBUG_BATTLE_SEED;
     MI_CpuClear8(sResults, sizeof(sResults));
+    DebugBattle_Log("BTEST1 BEGIN fixture=%u cases=%u", DEBUG_BATTLE_FIXTURE_VERSION, DEBUG_BATTLE_CASE_COUNT);
     FieldSystem_CreateTask(fieldSystem, DebugBattle_Task, env);
     return TRUE;
 }
@@ -237,9 +261,6 @@ static BOOL DebugBattle_Task(FieldTask *task)
         if (result->damage != test->expectedDamage) result->failures |= DEBUG_BATTLE_FAIL_DAMAGE;
         if (result->playerPP + 1 != env->playerPP || result->opponentPP + 1 != env->opponentPP) result->failures |= DEBUG_BATTLE_FAIL_PP;
         if (sCommands[0] != 2 || sCommands[1] != 2) result->failures |= DEBUG_BATTLE_FAIL_SCRIPT;
-        OS_Printf("BTEST v%d case=%d run=%d fail=%u expected=%u exit=%u turns=%u hp=%u/%u damage=%u pp=%u\n",
-            DEBUG_BATTLE_FIXTURE_VERSION, env->test + 1, env->repeat + 1, result->failures, result->expectedFailures,
-            result->result, result->turns, result->playerHP, result->opponentHP, result->damage, result->playerPP);
         if (env->repeat == 0) {
             env->firstRun = *result;
             env->repeat = 1;
@@ -250,6 +271,9 @@ static BOOL DebugBattle_Task(FieldTask *task)
         result->failures |= env->firstRun.failures;
         if (!result->repeatMatched) result->failures |= DEBUG_BATTLE_FAIL_REPEAT;
         result->valid = TRUE;
+        DebugBattle_Log("BTEST1 CASE id=%u fail=%u expected=%u repeat=%u damage=%u target=%u",
+            env->test + 1, result->failures, result->expectedFailures,
+            result->repeatMatched, result->damage, test->expectedDamage);
         env->repeat = 0;
         if (++env->test < DEBUG_BATTLE_CASE_COUNT) {
             *state = 2;
@@ -269,6 +293,11 @@ static BOOL DebugBattle_Task(FieldTask *task)
         FieldBattleDTO_Free(env->dto);
         Heap_Free(env);
         FieldSystem_ResumeProcessing();
+#if BATTLE_TESTS_LOG_ENABLED
+        DebugBattleSummary summary = DebugBattle_GetSummary();
+        DebugBattle_Log("BTEST1 END completed=%u pass=%u probe=%u fail=%u repeat=%u",
+            summary.completed, summary.passed, summary.probes, summary.failed, summary.repeats);
+#endif
         return TRUE;
     }
     return FALSE;

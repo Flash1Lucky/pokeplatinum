@@ -22,6 +22,7 @@
 #include "camera.h"
 #include "debug.h"
 #include "debug_battle.h"
+#include "battle_tests_config.h"
 #include "overlay005/debug_battle_menu.h"
 #include "field_map_change.h"
 #include "field_system.h"
@@ -574,7 +575,7 @@ static void Task_DebugSubMenu_HandleInput(SysTask *task, void *data)
     } else if (JOY_NEW(PAD_BUTTON_A)) {
         if (config->choiceFunc != NULL) {
             config->choiceFunc(subMenu);
-            if (sSubMenuConfigs[subMenu->type].closeOnChoice) {
+            if (config->closeOnChoice) {
                 DebugSubMenu_ExitToField(task, subMenu);
                 return;
             }
@@ -1177,11 +1178,16 @@ static void DebugFunction_ExecuteFunction(SysTask *task, DebugMenu *menu)
 
 static void DebugFunction_BattleFixture(SysTask *task, DebugMenu *menu)
 {
-    if (DebugBattle_Start(menu->fieldSystem)) {
-        DebugMenu_Close(task, menu);
-    } else {
+    if (!BATTLE_TESTS_BUILD_ENABLED) {
         DebugFunction_BattleResult(task, menu);
+        return;
     }
+
+    // Transfer ownership of the paused field to the harness menu. Remove the
+    // debug windows first because both interfaces use the same BG3 tiles.
+    FieldSystem *fieldSystem = menu->fieldSystem;
+    DebugMenu_Close(task, menu);
+    DebugBattleMenu_Open(fieldSystem);
 }
 
 static void DebugFunction_BattleResult(SysTask *task, DebugMenu *menu)
