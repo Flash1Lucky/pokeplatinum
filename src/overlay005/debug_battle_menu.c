@@ -120,6 +120,17 @@ static void Close(SysTask *task, BattleTestMenu *menu)
 static void HandleInput(SysTask *task, void *data)
 {
     BattleTestMenu *menu = data;
+    if (menu->window == NULL) {
+        // Field input clears the map popup and signpost after Open returns.
+        // Both share BG3 with this window, so draw only after that cleanup.
+        FieldSystem *fieldSystem = menu->fieldSystem;
+        menu->window = Window_New(HEAP_ID_FIELD1, 1);
+        LoadStandardWindowGraphics(fieldSystem->bgConfig, BG_LAYER_MAIN_3, 660, 11, STANDARD_WINDOW_SYSTEM, HEAP_ID_FIELD1);
+        Window_Add(fieldSystem->bgConfig, menu->window, BG_LAYER_MAIN_3, 2, 1, 26, 20, 13, 8);
+        Window_DrawStandardFrame(menu->window, TRUE, 660, 11);
+        Refresh(menu);
+        return;
+    }
     if (gSystem.pressedKeys & PAD_BUTTON_B) {
         Close(task, menu);
         FieldSystem_ResumeProcessing();
@@ -147,11 +158,7 @@ void DebugBattleMenu_Open(FieldSystem *fieldSystem)
     BattleTestMenu *menu = Heap_Alloc(HEAP_ID_FIELD1, sizeof(*menu));
     menu->fieldSystem = fieldSystem;
     menu->page = 0;
-    menu->window = Window_New(HEAP_ID_FIELD1, 1);
-    LoadStandardWindowGraphics(fieldSystem->bgConfig, BG_LAYER_MAIN_3, 660, 11, STANDARD_WINDOW_SYSTEM, HEAP_ID_FIELD1);
-    Window_Add(fieldSystem->bgConfig, menu->window, BG_LAYER_MAIN_3, 2, 1, 26, 20, 13, 8);
-    Window_DrawStandardFrame(menu->window, TRUE, 660, 11);
-    Refresh(menu);
+    menu->window = NULL;
     FieldSystem_PauseProcessing();
     SysTask_Start(HandleInput, menu, 0);
 }

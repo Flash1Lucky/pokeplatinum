@@ -31,3 +31,7 @@ Current status: extraction source prepared; host reporting tests passed; both so
 ## Continuing work
 
 Apply the standing feature workflow: preserve local work, develop alongside tools, separate true prerequisites from tooling/adapters/campaign content, extract onto clean upstream, validate minimal and combined configurations, document evidence, and only then promote. Do not merge the combined branch wholesale into the reusable branch. The extraction worktree contains no copied ROM/save binaries in tracked files; SDK/tooling sources and build outputs remain ignored.
+
+## 2026-10-05 checkpoint update
+
+The earlier running-build status is superseded by [the verified checkpoint](foundation-checkpoint-20261005.md). New ROM runtime acceptance remains pending. See [structured log capture](battle-test-logging.md).
