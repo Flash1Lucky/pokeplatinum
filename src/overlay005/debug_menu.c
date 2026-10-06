@@ -574,7 +574,7 @@ static void Task_DebugSubMenu_HandleInput(SysTask *task, void *data)
     } else if (JOY_NEW(PAD_BUTTON_A)) {
         if (config->choiceFunc != NULL) {
             config->choiceFunc(subMenu);
-            if (sSubMenuConfigs[subMenu->type].closeOnChoice) {
+            if (config->closeOnChoice) {
                 DebugSubMenu_ExitToField(task, subMenu);
                 return;
             }
