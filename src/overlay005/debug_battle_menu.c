@@ -51,18 +51,19 @@ static void Render(ResultView *subMenu)
         DebugBattleSummary summary = DebugBattle_GetSummary();
         u32 status = BattleTests_Text_NoBattleResult;
         if (summary.failed) status = BattleTests_Text_BattleFail;
-        else if (summary.completed == DEBUG_BATTLE_CASE_COUNT && summary.repeats == DEBUG_BATTLE_CASE_COUNT) status = BattleTests_Text_BattlePass;
+        else if (summary.completed == DebugBattle_GetSelectedCount() && summary.repeats == DebugBattle_GetSelectedCount()) status = BattleTests_Text_BattlePass;
         Print(subMenu, status, 0, 0, TEXT_SPEED_INSTANT, DEBUG_TEXT_BLACK);
         StringTemplate_SetNumber(subMenu->template, 0, summary.completed, 2, PADDING_MODE_NONE, CHARSET_MODE_EN);
-        StringTemplate_SetNumber(subMenu->template, 1, DEBUG_BATTLE_CASE_COUNT, 2, PADDING_MODE_NONE, CHARSET_MODE_EN);
+        StringTemplate_SetNumber(subMenu->template, 1, DebugBattle_GetSelectedCount(), 2, PADDING_MODE_NONE, CHARSET_MODE_EN);
         StringTemplate_SetNumber(subMenu->template, 2, summary.passed, 2, PADDING_MODE_NONE, CHARSET_MODE_EN);
         StringTemplate_SetNumber(subMenu->template, 3, summary.probes, 2, PADDING_MODE_NONE, CHARSET_MODE_EN);
         StringTemplate_SetNumber(subMenu->template, 4, summary.failed, 2, PADDING_MODE_NONE, CHARSET_MODE_EN);
         StringTemplate_SetNumber(subMenu->template, 5, summary.repeats, 2, PADDING_MODE_NONE, CHARSET_MODE_EN);
         Print(subMenu, BattleTests_Text_BattleSummary, 0, 16, TEXT_SPEED_INSTANT, DEBUG_TEXT_BLACK);
+        Print(subMenu, DebugBattle_GetFirstCase() == 0 ? BattleTests_Text_GroupAll : BattleTests_Text_GroupFairy, 0, 112, TEXT_SPEED_INSTANT, DEBUG_TEXT_BLACK);
         return;
     }
-    int index = subMenu->value - 1;
+    int index = DebugBattle_GetFirstCase() + subMenu->value - 1;
     const DebugBattleResult *result = DebugBattle_GetResult(index);
     if (!result->valid) {
         Print(subMenu, BattleTests_Text_NoBattleResult, 0, 0, TEXT_SPEED_INSTANT, DEBUG_TEXT_BLACK);
@@ -101,7 +102,7 @@ static void Refresh(BattleTestMenu *menu)
     DebugBattleMenu_Render(menu->window, menu->page);
     MessageLoader *loader = MessageLoader_Init(MSG_LOADER_LOAD_ON_DEMAND, NARC_INDEX_MSGDATA__PL_MSG, TEXT_BANK_BATTLE_TESTS, HEAP_ID_FIELD1);
     String *text = MessageLoader_GetNewString(loader, BattleTests_Text_Controls);
-    Text_AddPrinterWithParamsAndColor(menu->window, FONT_SYSTEM, text, 0, 144, TEXT_SPEED_INSTANT, DEBUG_TEXT_BLACK, NULL);
+    Text_AddPrinterWithParamsAndColor(menu->window, FONT_SYSTEM, text, 0, 128, TEXT_SPEED_INSTANT, DEBUG_TEXT_BLACK, NULL);
     String_Free(text);
     MessageLoader_Free(loader);
     Window_CopyToVRAM(menu->window);
@@ -136,15 +137,16 @@ static void HandleInput(SysTask *task, void *data)
         FieldSystem_ResumeProcessing();
         return;
     }
-    if (gSystem.pressedKeys & PAD_BUTTON_A) {
-        if (DebugBattle_Start(menu->fieldSystem)) {
+    if (gSystem.pressedKeys & (PAD_BUTTON_A | PAD_BUTTON_X)) {
+        enum DebugBattleGroup group = (gSystem.pressedKeys & PAD_BUTTON_A) ? DEBUG_BATTLE_GROUP_ALL : DEBUG_BATTLE_GROUP_FAIRY;
+        if (DebugBattle_StartGroup(menu->fieldSystem, group)) {
             Close(task, menu);
             return;
         }
         menu->page = 0;
         Refresh(menu);
     } else if (gSystem.pressedKeys & PAD_KEY_UP) {
-        if (menu->page < DEBUG_BATTLE_CASE_COUNT) menu->page++;
+        if (menu->page < DebugBattle_GetSelectedCount()) menu->page++;
         Refresh(menu);
     } else if (gSystem.pressedKeys & PAD_KEY_DOWN) {
         if (menu->page > 0) menu->page--;

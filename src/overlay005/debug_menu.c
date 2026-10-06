@@ -203,10 +203,6 @@ static const DebugMenuItem sMainMenuItems[DEBUG_MAIN_ITEM_COUNT] = {
         .function = DebugFunction_BattleFixture,
         .name = DebugMenu_ItemName_BattleFixture,
     },
-    [DEBUG_ITEM_BATTLE_RESULT] = {
-        .function = DebugFunction_BattleResult,
-        .name = DebugMenu_ItemName_BattleResult,
-    },
 };
 
 static const DebugMenuItem sFlagVarItems[DEBUG_FLAG_VAR_ITEM_COUNT] = {

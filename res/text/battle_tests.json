@@ -61,8 +61,48 @@
       "id": "BattleTests_Text_TestProbe"
     },
     {
-      "en_US": "A: run suite   B: close",
+      "en_US": "A: Run All   X: Fairy\nB: Close   Up/Down: Results",
       "id": "BattleTests_Text_Controls"
+    },
+    {
+      "id": "BattleTests_Text_FairyNeutral",
+      "en_US": "Judgment+Plate"
+    },
+    {
+      "id": "BattleTests_Text_FairySuper",
+      "en_US": "Fairy vs Dragon"
+    },
+    {
+      "id": "BattleTests_Text_FairyResisted",
+      "en_US": "Fairy vs Fire"
+    },
+    {
+      "id": "BattleTests_Text_FairyArceus",
+      "en_US": "Fairy Arceus STAB"
+    },
+    {
+      "id": "BattleTests_Text_FairyImmune",
+      "en_US": "Dragon immunity"
+    },
+    {
+      "id": "BattleTests_Text_FairyPoison",
+      "en_US": "Poison vs Fairy"
+    },
+    {
+      "id": "BattleTests_Text_FairySteel",
+      "en_US": "Steel vs Fairy"
+    },
+    {
+      "id": "BattleTests_Text_FairyFighting",
+      "en_US": "Fighting vs Fairy"
+    },
+    {
+      "id": "BattleTests_Text_GroupAll",
+      "en_US": "Group: All (16)"
+    },
+    {
+      "id": "BattleTests_Text_GroupFairy",
+      "en_US": "Group: Fairy (8)"
     }
   ],
   "key": 0

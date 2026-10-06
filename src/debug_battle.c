@@ -78,6 +78,8 @@ typedef struct DebugBattleEnv {
 // Resident in main: the callback must survive unloading the field overlay.
 static DebugBattleResult sResults[DEBUG_BATTLE_CASE_COUNT];
 static BOOL sActive;
+static int sFirstCase;
+static int sSelectedCount = DEBUG_BATTLE_CASE_COUNT;
 static u32 sCommands[2];
 static int sDamagePercent;
 
@@ -90,6 +92,8 @@ typedef struct DebugBattleCase {
     u16 name;
     u32 seed;
     u32 expectedFailures;
+    u16 heldItem;
+    u16 ability;
 } DebugBattleCase;
 
 // Level 50, power 60, SpAtk = SpDef = 100: floor(22 * 60 / 50) + 2 = 28.
@@ -103,10 +107,18 @@ static const DebugBattleCase sCases[DEBUG_BATTLE_CASE_COUNT] = {
     { SPECIES_PIKACHU, SPECIES_SQUIRTLE, MOVE_SHOCK_WAVE, 100, 84, BattleTests_Text_TestStabSuper, DEBUG_BATTLE_SEED, 0 },
     { SPECIES_ABRA, SPECIES_SNORLAX, MOVE_SHOCK_WAVE, 85, 23, BattleTests_Text_TestLowRoll, DEBUG_BATTLE_SEED, 0 },
     { SPECIES_ABRA, SPECIES_SNORLAX, MOVE_SHOCK_WAVE, 100, 0, BattleTests_Text_TestProbe, DEBUG_BATTLE_SEED, DEBUG_BATTLE_FAIL_DAMAGE },
+    { SPECIES_ABRA, SPECIES_SNORLAX, MOVE_JUDGMENT, 100, 54, BattleTests_Text_FairyNeutral, DEBUG_BATTLE_SEED, 0, ITEM_PIXIE_PLATE, ABILITY_NONE },
+    { SPECIES_ABRA, SPECIES_DRATINI, MOVE_JUDGMENT, 100, 108, BattleTests_Text_FairySuper, DEBUG_BATTLE_SEED, 0, ITEM_PIXIE_PLATE, ABILITY_NONE },
+    { SPECIES_ABRA, SPECIES_PONYTA, MOVE_JUDGMENT, 100, 27, BattleTests_Text_FairyResisted, DEBUG_BATTLE_SEED, 0, ITEM_PIXIE_PLATE, ABILITY_NONE },
+    { SPECIES_ARCEUS, SPECIES_SNORLAX, MOVE_JUDGMENT, 100, 81, BattleTests_Text_FairyArceus, DEBUG_BATTLE_SEED, 0, ITEM_PIXIE_PLATE, ABILITY_MULTITYPE },
+    { SPECIES_ABRA, SPECIES_CLEFAIRY, MOVE_DRAGON_BREATH, 100, 0, BattleTests_Text_FairyImmune, DEBUG_BATTLE_SEED, 0, ITEM_NONE, ABILITY_NONE },
+    { SPECIES_ABRA, SPECIES_CLEFAIRY, MOVE_ACID, 100, 38, BattleTests_Text_FairyPoison, DEBUG_BATTLE_SEED, 0, ITEM_NONE, ABILITY_NONE },
+    { SPECIES_ABRA, SPECIES_CLEFAIRY, MOVE_FLASH_CANNON, 100, 74, BattleTests_Text_FairySteel, DEBUG_BATTLE_SEED, 0, ITEM_NONE, ABILITY_NONE },
+    { SPECIES_ABRA, SPECIES_CLEFAIRY, MOVE_AURA_SPHERE, 100, 20, BattleTests_Text_FairyFighting, DEBUG_BATTLE_SEED, 0, ITEM_NONE, ABILITY_NONE },
 };
 static BOOL DebugBattle_Task(FieldTask *task);
 
-static void DebugBattle_AddMon(FieldBattleDTO *dto, int battler, int species, u32 personality, int ability, u16 move)
+static void DebugBattle_AddMon(FieldBattleDTO *dto, int battler, int species, u32 personality, int ability, u16 move, u16 heldItem)
 {
     Pokemon *mon = Pokemon_New(HEAP_ID_FIELD2);
     Pokemon_InitWith(mon, species, 50, 20, TRUE, personality, OTID_SET, 0x1234);
@@ -124,6 +136,8 @@ static void DebugBattle_AddMon(FieldBattleDTO *dto, int battler, int species, u3
     Pokemon_SetValue(mon, MON_DATA_FORM, &zero);
     Pokemon_SetValue(mon, MON_DATA_OT_GENDER, &zero);
     Pokemon_SetValue(mon, MON_DATA_OT_NAME, dto->trainerInfo[0]->name);
+    Pokemon_SetValue(mon, MON_DATA_HELD_ITEM, &heldItem);
+    Pokemon_SetArceusForm(mon);
     Pokemon_CalcLevelAndStats(mon);
     // Normalize battle stats independently of species so type changes are the
     // only relevant difference. These are temporary party copies, never saved.
@@ -144,6 +158,14 @@ static void DebugBattle_AddMon(FieldBattleDTO *dto, int battler, int species, u3
 
 BOOL DebugBattle_Start(FieldSystem *fieldSystem)
 {
+    return DebugBattle_StartGroup(fieldSystem, DEBUG_BATTLE_GROUP_ALL);
+}
+
+int DebugBattle_GetFirstCase(void) { return sFirstCase; }
+int DebugBattle_GetSelectedCount(void) { return sSelectedCount; }
+
+BOOL DebugBattle_StartGroup(FieldSystem *fieldSystem, enum DebugBattleGroup group)
+{
     if (!BATTLE_TESTS_BUILD_ENABLED || sActive || FieldSystem_IsRunningTask(fieldSystem)
         || FieldSystem_HasChildProcess(fieldSystem)
         || !FieldSystem_IsRunningFieldMap(fieldSystem)) {
@@ -154,8 +176,12 @@ BOOL DebugBattle_Start(FieldSystem *fieldSystem)
         }
         return FALSE;
     }
+    if (group != DEBUG_BATTLE_GROUP_ALL && group != DEBUG_BATTLE_GROUP_FAIRY) return FALSE;
+    sFirstCase = group == DEBUG_BATTLE_GROUP_FAIRY ? 8 : 0;
+    sSelectedCount = DEBUG_BATTLE_CASE_COUNT - sFirstCase;
     DebugBattleEnv *env = Heap_Alloc(HEAP_ID_FIELD2, sizeof(DebugBattleEnv));
     MI_CpuClear8(env, sizeof(DebugBattleEnv));
+    env->test = sFirstCase;
     env->fieldSeed = LCRNG_GetSeed();
     env->dto = FieldBattleDTO_New(HEAP_ID_FIELD2, BATTLE_TYPE_WILD_MON | BATTLE_TYPE_DEBUG);
     FieldBattleDTO *dto = env->dto;
@@ -187,8 +213,8 @@ BOOL DebugBattle_Start(FieldSystem *fieldSystem)
     MessageLoader_Free(loader);
     FieldBattleDTO_CopyPlayerInfoToTrainerData(dto);
 
-    DebugBattle_AddMon(dto, BATTLER_PLAYER_1, sCases[0].playerSpecies, 0, ABILITY_NONE, sCases[0].move);
-    DebugBattle_AddMon(dto, BATTLER_ENEMY_1, sCases[0].opponentSpecies, 25, ABILITY_BATTLE_ARMOR, MOVE_SPLASH);
+    DebugBattle_AddMon(dto, BATTLER_PLAYER_1, sCases[sFirstCase].playerSpecies, 0, sCases[sFirstCase].ability, sCases[sFirstCase].move, sCases[sFirstCase].heldItem);
+    DebugBattle_AddMon(dto, BATTLER_ENEMY_1, sCases[sFirstCase].opponentSpecies, 25, ABILITY_BATTLE_ARMOR, MOVE_SPLASH, ITEM_NONE);
     dto->background = BACKGROUND_PLAIN;
     dto->terrain = TERRAIN_PLAIN;
     dto->fieldWeather = OVERWORLD_WEATHER_CLEAR;
@@ -198,7 +224,7 @@ BOOL DebugBattle_Start(FieldSystem *fieldSystem)
     dto->mapEvolutionMethod = 0;
     dto->seed = DEBUG_BATTLE_SEED;
     MI_CpuClear8(sResults, sizeof(sResults));
-    DebugBattle_Log("BTEST1 BEGIN fixture=%u cases=%u", DEBUG_BATTLE_FIXTURE_VERSION, DEBUG_BATTLE_CASE_COUNT);
+    DebugBattle_Log("BTEST1 BEGIN fixture=%u cases=%u group=%u", DEBUG_BATTLE_FIXTURE_VERSION, sSelectedCount, group);
     FieldSystem_CreateTask(fieldSystem, DebugBattle_Task, env);
     return TRUE;
 }
@@ -220,8 +246,8 @@ static BOOL DebugBattle_Task(FieldTask *task)
         break;
     case 2:
         // Rebuild both parties between cases; never inherit HP, PP or status.
-        DebugBattle_AddMon(env->dto, BATTLER_PLAYER_1, sCases[env->test].playerSpecies, 0, ABILITY_NONE, sCases[env->test].move);
-        DebugBattle_AddMon(env->dto, BATTLER_ENEMY_1, sCases[env->test].opponentSpecies, 25, ABILITY_BATTLE_ARMOR, MOVE_SPLASH);
+        DebugBattle_AddMon(env->dto, BATTLER_PLAYER_1, sCases[env->test].playerSpecies, 0, sCases[env->test].ability, sCases[env->test].move, sCases[env->test].heldItem);
+        DebugBattle_AddMon(env->dto, BATTLER_ENEMY_1, sCases[env->test].opponentSpecies, 25, ABILITY_BATTLE_ARMOR, MOVE_SPLASH, ITEM_NONE);
         env->playerHP = Pokemon_GetValue(Party_GetPokemonBySlotIndex(env->dto->parties[0], 0), MON_DATA_HP, NULL);
         env->opponentHP = Pokemon_GetValue(Party_GetPokemonBySlotIndex(env->dto->parties[1], 0), MON_DATA_HP, NULL);
         env->playerPP = Pokemon_GetValue(Party_GetPokemonBySlotIndex(env->dto->parties[0], 0), MON_DATA_MOVE1_PP, NULL);
