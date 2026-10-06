@@ -1,4 +1,5 @@
 #include "overlay005/debug_mon_menu.h"
+#include "overlay005/debug_mon_shiny.h"
 
 #include "constants/battle/condition.h"
 #include "constants/charcode.h"
@@ -107,6 +108,7 @@ static const DebugMonStatBounds sBoundsDay = { 1, 31, 2 };
 static const DebugMonStatBounds sBoundsHasNickname = { 0, 1, 0 };
 
 static const DebugMonStat sDebugMonStats[MAX_DEBUG_MON_STAT] = {
+    [DEBUG_MON_SHINY] = { DebugMonMenu_Text_Shiny, &sBoundsIsEgg },
     [DEBUG_MON_SPECIES] = { DebugMonMenu_Text_Species, &sBoundsSpeciesStats },
     [DEBUG_MON_LEVEL] = { DebugMonMenu_Text_Level, &sBoundsLevel },
     [DEBUG_MON_EXP] = { DebugMonMenu_Text_ExpPoints, &sBoundsExpPoints },
@@ -186,6 +188,7 @@ static const u8 sDebugMonPage1[] = {
     DEBUG_MON_PERSONALITY,
     DEBUG_MON_GENDER,
     DEBUG_MON_NATURE,
+    DEBUG_MON_SHINY,
     DEBUG_MON_PAGE_END,
 };
 
@@ -262,7 +265,7 @@ static const u8 sDebugMonPage8[] = {
 };
 
 static const DebugMonMenuPage sDebugMonMenuPages[DEBUG_MON_MENU_MAX_PAGES] = {
-    { sDebugMonPage1, 7 },
+    { sDebugMonPage1, 8 },
     { sDebugMonPage2, 6 },
     { sDebugMonPage3, 6 },
     { sDebugMonPage4, 6 },
@@ -331,6 +334,11 @@ static void DebugMonMenu_HandleInput(DebugMonMenu *monMenu)
         // Gender is derived from the PID; edit PID or nature instead.
         if (sDebugMonMenuPages[monMenu->page].page[monMenu->cursor] == DEBUG_MON_GENDER) {
             return;
+        }
+        if (sDebugMonMenuPages[monMenu->page].page[monMenu->cursor] == DEBUG_MON_SHINY) {
+            Window_FillTilemap(&monMenu->titleWindow, DEBUG_COLOR_WHITE);
+            DebugMonMenu_PrintString(&monMenu->titleWindow, monMenu->msgLoader, DebugMonMenu_Text_ShinyWarning, 0, 0, TEXT_SPEED_INSTANT, DEBUG_TEXT_BLACK);
+            Window_ScheduleCopyToVRAM(&monMenu->titleWindow);
         }
         Pokemon_Copy(monMenu->mon.data, monMenu->mon.backup);
         MI_CpuCopy8(monMenu->mon.stats, monMenu->mon.statsBackup, sizeof(monMenu->mon.stats));
@@ -623,10 +631,21 @@ static void DebugMonMenu_ChangeValue(DebugMonMenu *monMenu, enum DebugMonValueDi
         currentValue = dir == DMV_DIR_DECREASE ? ITEM_UNUSED_113 - 1 : ITEM_UNUSED_134 + 1;
     }
     DebugMonStat_Set(&monMenu->mon, currentValue, sDebugMonMenuPages[monMenu->page].page[monMenu->cursor]);
+    if (sDebugMonMenuPages[monMenu->page].page[monMenu->cursor] == DEBUG_MON_SHINY
+        && monMenu->mon.stats[DEBUG_MON_SHINY] != currentValue) {
+        Window_FillTilemap(&monMenu->titleWindow, DEBUG_COLOR_WHITE);
+        DebugMonMenu_PrintString(&monMenu->titleWindow, monMenu->msgLoader, DebugMonMenu_Text_ShinyUnavailable, 0, 0, TEXT_SPEED_INSTANT, DEBUG_TEXT_BLACK);
+        Window_ScheduleCopyToVRAM(&monMenu->titleWindow);
+    }
 }
 
 static void DebugMonMenu_DisplayPageAndCursor(DebugMonMenu *monMenu)
 {
+    Window_FillTilemap(&monMenu->titleWindow, DEBUG_COLOR_WHITE);
+    DebugMonMenu_PrintString(&monMenu->titleWindow, monMenu->msgLoader,
+        monMenu->mode == DEBUG_MON_MENU_MODE_EDIT ? DebugMonMenu_Text_EditInstructions : DebugMonMenu_Text_CreateInstructions,
+        0, 0, TEXT_SPEED_INSTANT, DEBUG_TEXT_BLACK);
+    Window_ScheduleCopyToVRAM(&monMenu->titleWindow);
     DebugMonMenu_DisplayPage(monMenu);
     DebugMonMenu_DisplayCursor(monMenu, DMV_DIR_NONE);
     monMenu->state = DMM_STATE_HANDLE_INPUT;
@@ -778,6 +797,7 @@ static void DebugMon_SetStatsFromMonData(DebugMon *mon)
     mon->stats[DEBUG_MON_PERSONALITY] = Pokemon_GetValue(mon->data, MON_DATA_PERSONALITY, NULL);
     mon->stats[DEBUG_MON_GENDER] = Pokemon_GetValue(mon->data, MON_DATA_GENDER, NULL);
     mon->stats[DEBUG_MON_NATURE] = Pokemon_GetNature(mon->data);
+    mon->stats[DEBUG_MON_SHINY] = Pokemon_IsPersonalityShiny(mon->stats[DEBUG_MON_OT_ID], mon->stats[DEBUG_MON_PERSONALITY]);
     mon->stats[DEBUG_MON_MOVE1] = Pokemon_GetValue(mon->data, MON_DATA_MOVE1, NULL);
     mon->stats[DEBUG_MON_MOVE2] = Pokemon_GetValue(mon->data, MON_DATA_MOVE2, NULL);
     mon->stats[DEBUG_MON_MOVE3] = Pokemon_GetValue(mon->data, MON_DATA_MOVE3, NULL);
@@ -1043,6 +1063,7 @@ static void DebugMonStat_Display(DebugMonMenu *monMenu, u8 statID, u32 color, u8
         DebugMonStat_PrintNum(monMenu, &monMenu->mainWindow, mon->stats[statID], digits, 108, y, TEXT_SPEED_NO_TRANSFER, color);
         break;
 
+    case DEBUG_MON_SHINY:
     case DEBUG_MON_IS_EGG:
     case DEBUG_MON_FATEFUL_ENCOUNTER:
     case DEBUG_MON_HAS_NICKNAME:
@@ -1180,7 +1201,9 @@ static void DebugMonStat_Set(DebugMon *mon, u32 value, u8 statID)
     if (statID == DEBUG_MON_GENDER) {
         return;
     }
-    if (statID == DEBUG_MON_NATURE) {
+    if (statID == DEBUG_MON_SHINY) {
+        mon->stats[DEBUG_MON_PERSONALITY] = DebugMon_WithShininess(mon->stats[DEBUG_MON_OT_ID], mon->stats[DEBUG_MON_PERSONALITY], value, SpeciesData_GetSpeciesValue(mon->stats[DEBUG_MON_SPECIES], SPECIES_DATA_GENDER_RATIO));
+    } else if (statID == DEBUG_MON_NATURE) {
         // Preserve the low byte (gender and ability parity). Shiny status may change.
         u32 pid = mon->stats[DEBUG_MON_PERSONALITY];
         pid = DebugMenu_PersonalityWithNature(pid, value);

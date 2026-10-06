@@ -318,6 +318,9 @@
     {
       "id": "DebugMonMenu_Text_StorageFull",
       "en_US": "Party and PC are full.\nNo Pokemon was added."
-    }
+    },
+    {"id": "DebugMonMenu_Text_Shiny", "en_US": "Shiny"},
+    {"id": "DebugMonMenu_Text_ShinyWarning", "en_US": "Changes PID; Spinda spots may change.\nA: Keep value   B: Undo"},
+    {"id": "DebugMonMenu_Text_ShinyUnavailable", "en_US": "No compatible PID; nothing changed.\nA/B: Return"}
   ]
 }
