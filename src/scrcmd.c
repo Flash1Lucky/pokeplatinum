@@ -6419,7 +6419,7 @@ static BOOL ScrCmd_CheckItemIsPlate(ScriptContext *ctx)
 
     *destItemIsPlate = FALSE;
 
-    if ((item >= ITEM_FLAME_PLATE) && (item <= ITEM_IRON_PLATE)) {
+    if (((item >= ITEM_FLAME_PLATE) && (item <= ITEM_IRON_PLATE)) || item == ITEM_PIXIE_PLATE) {
         *destItemIsPlate = TRUE;
     }
 

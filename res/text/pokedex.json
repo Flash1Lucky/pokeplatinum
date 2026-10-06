@@ -524,6 +524,10 @@
     {
       "id": "pl_msg_pokedex_nonetype",
       "en_US": "- - - -"
+    },
+    {
+      "id": "pl_msg_pokedex_fairy",
+      "en_US": "Fairy"
     }
   ]
 }

@@ -69,6 +69,7 @@ enum PokedexDataSortIndex {
     PDSI_FINS,
     PDSI_HEAD,
     PDSI_MULTIBODY,
+    PDSI_FAIRY, // Appended after legacy body-shape indices.
     PDSI_NUMSORTS
 };
 
@@ -873,6 +874,9 @@ static void FilterByType(int typeFilter, u16 *resultingPokedex, int *numResultin
         break;
     case FT_DARK:
         pokedexFromFile = PokedexFromNARC(heapID, PDSI_DARK, &pokedexLength);
+        break;
+    case FT_FAIRY:
+        pokedexFromFile = PokedexFromNARC(heapID, PDSI_FAIRY, &pokedexLength);
         break;
     default:
         GF_ASSERT(FALSE);

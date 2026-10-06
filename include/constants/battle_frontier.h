@@ -1,6 +1,9 @@
 #ifndef POKEPLATINUM_CONSTANTS_BATTLE_FRONTIER_H
 #define POKEPLATINUM_CONSTANTS_BATTLE_FRONTIER_H
 
+// Saved Hall ranks retain the original type mapping, including the Mystery slot.
+#define HALL_NUM_TYPES 18
+
 enum BattleFrontierScene {
     FRONTIER_SCENE_0 = 0,
     FRONTIER_SCENE_1,

@@ -96,6 +96,9 @@ u16 BoxPokemon_IconFormOffset(const BoxPokemon *boxMon)
     u32 speciesOrEgg = BoxPokemon_GetValue((BoxPokemon *)boxMon, MON_DATA_SPECIES_OR_EGG, NULL);
 
     switch (speciesOrEgg) {
+    case SPECIES_ARCEUS:
+        // All plate forms, including Fairy, use the shared Arceus icon.
+        return 0;
     case SPECIES_UNOWN:
         return BoxPokemon_GetForm((BoxPokemon *)boxMon);
     case SPECIES_DEOXYS:

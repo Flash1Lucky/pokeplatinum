@@ -393,7 +393,8 @@ u8 Item_IsHerbalMedicine(u16 item)
 
 void *ItemTable_Load(enum HeapID heapID)
 {
-    int maxItem = Item_FileID(NUM_ITEMS, ITEM_FILE_TYPE_DATA);
+    // Archive IDs are zero-based; include the final item record.
+    int maxItem = Item_FileID(NUM_ITEMS, ITEM_FILE_TYPE_DATA) + 1;
     return NARC_AllocAndReadFromMemberByIndexPair(NARC_INDEX_ITEMTOOL__ITEMDATA__PL_ITEM_DATA, 0, heapID, 0, sizeof(ItemData) * maxItem);
 }
 

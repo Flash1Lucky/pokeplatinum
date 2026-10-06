@@ -2871,9 +2871,15 @@ void BuildPokemonSpriteTemplate(PokemonSpriteTemplate *spriteTemplate, u16 speci
         break;
 
     case SPECIES_ARCEUS:
-        spriteTemplate->narcID = NARC_INDEX_POKETOOL__POKEGRA__PL_OTHERPOKE;
-        spriteTemplate->character = 96 + (face / 2) + form * 2;
-        spriteTemplate->palette = 190 + shiny + form * 2;
+        if (form == TYPE_FAIRY) {
+            spriteTemplate->narcID = NARC_INDEX_POKETOOL__POKEGRA__PL_OTHERPOKE;
+            spriteTemplate->character = ARCEUS_FAIRY_SPRITE_BACK + face / 2;
+            spriteTemplate->palette = ARCEUS_FAIRY_PALETTE_NORMAL + shiny;
+        } else {
+            spriteTemplate->narcID = NARC_INDEX_POKETOOL__POKEGRA__PL_OTHERPOKE;
+            spriteTemplate->character = 96 + (face / 2) + form * 2;
+            spriteTemplate->palette = 190 + shiny + form * 2;
+        }
         break;
 
     case SPECIES_CASTFORM:
@@ -3068,9 +3074,15 @@ static void BuildPokemonSpriteTemplateDP(PokemonSpriteTemplate *spriteTemplate, 
         break;
 
     case SPECIES_ARCEUS:
-        spriteTemplate->narcID = NARC_INDEX_POKETOOL__POKEGRA__OTHERPOKE;
-        spriteTemplate->character = 96 + (face / 2) + form * 2;
-        spriteTemplate->palette = 170 + shiny + form * 2;
+        if (form == TYPE_FAIRY) {
+            spriteTemplate->narcID = NARC_INDEX_POKETOOL__POKEGRA__PL_OTHERPOKE;
+            spriteTemplate->character = ARCEUS_FAIRY_SPRITE_BACK + face / 2;
+            spriteTemplate->palette = ARCEUS_FAIRY_PALETTE_NORMAL + shiny;
+        } else {
+            spriteTemplate->narcID = NARC_INDEX_POKETOOL__POKEGRA__OTHERPOKE;
+            spriteTemplate->character = 96 + (face / 2) + form * 2;
+            spriteTemplate->palette = 170 + shiny + form * 2;
+        }
         break;
 
     case SPECIES_CASTFORM:
@@ -3222,7 +3234,7 @@ u8 LoadPokemonSpriteYOffset(u16 species, u8 gender, u8 face, u8 form, u32 person
 
     case SPECIES_ARCEUS:
         narcID = NARC_INDEX_POKETOOL__POKEGRA__HEIGHT_O;
-        memberIndex = 96 + (face / 2) + form * 2;
+        memberIndex = 96 + (face / 2) + (form == TYPE_FAIRY ? 0 : form * 2);
         break;
 
     case SPECIES_CASTFORM:
@@ -3311,7 +3323,7 @@ static u8 LoadPokemonDPSpriteHeight(u16 species, u8 gender, u8 face, u8 form, u3
 
     case SPECIES_ARCEUS:
         narcID = NARC_INDEX_POKETOOL__POKEGRA__DP_HEIGHT_O;
-        memberIndex = 96 + (face / 2) + form * 2;
+        memberIndex = 96 + (face / 2) + (form == TYPE_FAIRY ? 0 : form * 2);
         break;
 
     case SPECIES_CASTFORM:
@@ -4365,6 +4377,9 @@ u8 Pokemon_GetArceusTypeOf(u16 itemHoldEffect)
         break;
     case HOLD_EFFECT_ARCEUS_DARK:
         type = TYPE_DARK;
+        break;
+    case HOLD_EFFECT_ARCEUS_FAIRY:
+        type = TYPE_FAIRY;
         break;
     case HOLD_EFFECT_ARCEUS_STEEL:
         type = TYPE_STEEL;

@@ -422,6 +422,7 @@ item_icon_pals = files(
     'iron_ball.pal',
     'iron.pal',
     'iron_plate.pal',
+    'pixie_plate.pal',
     'jaboca_berry.pal',
     'journal.pal',
     'kasib_berry.pal',

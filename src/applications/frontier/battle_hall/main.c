@@ -1285,7 +1285,7 @@ static void GrayOutUnselectableCells(BattleHallApp *app, BgConfig *bgConfig)
             ChangeCellBackground(bgConfig, i, CELL_BACKGROUND_UNSELECTABLE);
         }
     } else {
-        for (int i = 0; i < (NUM_POKEMON_TYPES - 1); i++) {
+        for (int i = 0; i < (HALL_NUM_TYPES - 1); i++) {
             if (BattleHall_GetRankOfType(i, app->typeRanks) >= 10) {
                 ChangeCellBackground(bgConfig, i, CELL_BACKGROUND_UNSELECTABLE);
             }
