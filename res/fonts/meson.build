@@ -12,6 +12,17 @@ font_base_nclr = custom_target('font.NCLR',
     command: [ nitrogfx_exe, '@INPUT@', '@OUTPUT@', '-bitdepth', '4', '-nopad', '-pcmp' ],
 )
 
+# Editable PNG/JSON are the sources of truth; never regenerate them in a build.
+family_nfgr = []
+foreach font_family : ['narrow', 'narrower', 'short', 'shorter']
+    family_nfgr += custom_target('font_' + font_family + '.NFGR',
+        output: 'font_' + font_family + '.NFGR',
+        input: files('font_' + font_family + '.png', 'font_' + font_family + '.json'),
+        command: [ nitrogfx_exe, '@INPUT0@', '@OUTPUT@', '-metadata', '@INPUT1@' ],
+    )
+endforeach
+
+# Legacy font_compact assets/generator are retained for recovery only.
 pl_font_narc = custom_target('pl_font.narc',
     output: [
         'pl_font.narc',
@@ -39,6 +50,7 @@ pl_font_narc = custom_target('pl_font.narc',
             extra_args: [ '-bitdepth', '4' ],
         ),
         copy_gen.process(font_base_nclr),
+        copy_gen.process(family_nfgr),
     ],
     command: [
         nitroarc_exe,

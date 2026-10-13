@@ -77,6 +77,10 @@ void NitroMain(void)
     Font_InitManager(FONT_SYSTEM, HEAP_ID_APPLICATION);
     Font_InitManager(FONT_MESSAGE, HEAP_ID_APPLICATION);
     Font_InitManager(FONT_UNOWN, HEAP_ID_APPLICATION);
+    Font_InitManager(FONT_NARROW, HEAP_ID_APPLICATION);
+    Font_InitManager(FONT_NARROWER, HEAP_ID_APPLICATION);
+    Font_InitManager(FONT_SHORT, HEAP_ID_APPLICATION);
+    Font_InitManager(FONT_SHORTER, HEAP_ID_APPLICATION);
 
     sApplication.args.unk_00 = -1;
     sApplication.args.saveData = SaveData_Init();

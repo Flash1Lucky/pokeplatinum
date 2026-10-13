@@ -19,6 +19,10 @@ enum Font {
     FONT_MESSAGE,
     FONT_SUBSCREEN,
     FONT_UNOWN,
+    FONT_NARROW,
+    FONT_NARROWER,
+    FONT_SHORT,
+    FONT_SHORTER,
 
     FONT_MAX,
 };
@@ -56,6 +60,16 @@ u32 Font_CalcCharArrayWidth(enum Font font, const charcode_t *str, u32 letterSpa
 u32 Font_CalcStringWidth(enum Font font, const String *string, u32 letterSpacing);
 u32 Font_AreAllCharsValid(enum Font font, String *string, String *tmpbuf);
 u8 Font_GetAttribute(u8 font, u8 attribute);
+// Single-line resolved names only. Rejects control codes/unmapped glyphs.
+// FALSE means no safe fit; callers must handle it, not truncate or underflow.
+BOOL Font_TryFitName(enum Font preferred, const String *string, u32 usableWidth, enum Font *selected, u32 *measuredWidth);
+// Instant, zero-spacing plain-name printer. Clamps field to window, requires
+// a full 16-row cell, safely centers, and draws an X marker on unresolved fit.
+BOOL Font_PrintName(Window *window, enum Font preferred, const String *string, u32 x, u32 y, u32 usableWidth, BOOL centered, u32 color);
+// Color-only resolved labels: preserve COLOR 0..6, reject other controls.
+// Temporary measurement String uses the caller's heap and is freed immediately.
+BOOL Font_TryFitNameWithColor(enum Font preferred, const String *string, u32 usableWidth, enum Font *selected, u32 *measuredWidth, u32 heapID);
+BOOL Font_PrintNameWithColor(Window *window, enum Font preferred, const String *string, u32 x, u32 y, u32 usableWidth, u32 color, u32 heapID);
 void Font_LoadTextPalette(enum PaletteLoadLocation palLocation, u32 palSlotOffset, enum HeapID heapID);
 void Font_LoadScreenIndicatorsPalette(enum PaletteLoadLocation palLocation, u32 palSlotOffset, enum HeapID heapID);
 u32 Font_CalcMaxLineWidth(enum Font font, const String *string, u32 letterSpacing);
